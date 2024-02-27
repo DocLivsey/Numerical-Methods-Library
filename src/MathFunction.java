@@ -1,4 +1,5 @@
+import java.util.*;
 @FunctionalInterface
 public interface MathFunction {
-    Point2D function(double x);
+    Point2D function(ArrayList<Double> arguments);
 }
