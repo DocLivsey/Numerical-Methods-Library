@@ -1,50 +1,60 @@
 import java.io.*;
 import java.util.*;
 public class MathFunctionOperations extends MathBase {
+    protected ArrayList<Double> arguments;
     protected ArrayList<Point2D> points;
     protected MathFunction mathFunction;
-    MathFunctionOperations(String pathToPoints, MathFunction mathFunction) throws FileNotFoundException
+    MathFunctionOperations(String pathToPoints, ArrayList<Double> arguments, MathFunction mathFunction) throws FileNotFoundException
     {
+        this.arguments = arguments;
         this.points = new ArrayList<>();
         this.readPointsFromFile(pathToPoints);
         this.mathFunction = mathFunction;
         this.expandPointsArea();
-
-        for (int i = 0; i < this.points.size(); i++)
-        {
-            double x = this.getPoint(i).getX();
-            double y = this.calculatePoint(this.getPoint(i).getX()).getY();
-            this.setPoint(i, new Point2D(x, y));
-        }
+        if (this.isAnyNullValuesInPoints())
+            this.calculateNullValues();
     }
-    MathFunctionOperations(String pathToPoints) throws FileNotFoundException
+    MathFunctionOperations(String pathToPoints, ArrayList<Double> arguments) throws FileNotFoundException
     {
+        this.arguments = arguments;
         this.points = new ArrayList<>();
         this.readPointsFromFile(pathToPoints);
+        this.expandPointsArea();
     }
-    MathFunctionOperations(ArrayList<Point2D> arguments, MathFunction mathFunction)
+    MathFunctionOperations(ArrayList<Point2D> points, ArrayList<Double> arguments, MathFunction mathFunction)
     {
-        this.points = arguments;
+        this.arguments = arguments;
+        this.points = points;
         this.mathFunction = mathFunction;
         this.expandPointsArea();
+        if (this.isAnyNullValuesInPoints())
+            this.calculateNullValues();
     }
     MathFunctionOperations(ArrayList<Point2D> points)
-    { this.points = points; }
+    { this.points = points; this.expandPointsArea(); }
     MathFunctionOperations()
     {
         this.points = new ArrayList<>();
         this.mathFunction = x -> new Point2D(Double.NaN, Double.NaN);
     }
+    public ArrayList<Double> getArguments()
+    { return arguments; }
     public ArrayList<Point2D> getPoints()
     { return this.points; }
     public MathFunction getMathFunction()
     { return mathFunction; }
+    public double getArgument(int index)
+    { return this.arguments.get(index); }
     public Point2D getPoint(int index)
     { return this.points.get(index); }
+    public void setArguments(ArrayList<Double> arguments)
+    { this.arguments = arguments; }
     public void setPoints(ArrayList<Point2D> points)
     { this.points = points; }
     public void setMathFunction(MathFunction mathFunction)
     { this.mathFunction = mathFunction; }
+    public void setArgument(int index, double argument)
+    { this.arguments.set(index, argument); }
     public void setPoint(int index, Point2D point2D)
     { this.points.set(index, point2D); }
     public void addPoint(Point2D point)
@@ -59,7 +69,7 @@ public class MathFunctionOperations extends MathBase {
     public boolean equals(Object obj)
     { return super.equals(obj); }
     protected MathFunctionOperations cloneMathFunction()
-    { return new MathFunctionOperations(this.points, this.mathFunction); }
+    { return new MathFunctionOperations(this.points, this.arguments, this.mathFunction); }
     public void sortPoints()
     { this.points.sort(Comparator.comparingDouble(Point2D::getX)); }
     public void printPoints()
@@ -78,11 +88,13 @@ public class MathFunctionOperations extends MathBase {
     { System.out.println(PrettyOutput.HEADER_OUTPUT + "Функция\n" + PrettyOutput.OUTPUT + super.toString() + PrettyOutput.RESET); }
     public Point2D calculatePoint(double x)
     {
-        if (Math.abs(this.mathFunction.function(x).getY()) < super.getEpsilon())
+        this.setArgument(0, x);
+        if (Math.abs(this.mathFunction.function(this.arguments).getY()) < super.getEpsilon())
             return new Point2D(x, 0);
-        if (Math.abs(this.mathFunction.function(x).getY()) == Double.POSITIVE_INFINITY || Double.isNaN(this.mathFunction.function(x).getY()))
+        if (Math.abs(this.mathFunction.function(this.arguments).getY()) == Double.POSITIVE_INFINITY
+                || Double.isNaN(this.mathFunction.function(this.arguments).getY()))
             return  new Point2D(x, 1 / super.getEpsilon());
-        return this.mathFunction.function(x);
+        return this.mathFunction.function(this.arguments);
     }
     public double differential(Point2D point)
     {
@@ -107,6 +119,22 @@ public class MathFunctionOperations extends MathBase {
                 addedPoints.add(this.calculatePoint(varLeft + step));
             }
             this.addPoints(addedPoints);
+        }
+    }
+    public boolean isAnyNullValuesInPoints()
+    {
+        for (Point2D point : this.points)
+            if (Double.isNaN(point.getY()))
+                return true;
+        return false;
+    }
+    public void calculateNullValues()
+    {
+        for (int i = 0; i < this.points.size(); i++)
+        {
+            double x = this.getPoint(i).getX();
+            double y = this.calculatePoint(x).getY();
+            this.setPoint(i, new Point2D(x, y));
         }
     }
     public void readPointsFromFile(String pathToFile) throws FileNotFoundException {

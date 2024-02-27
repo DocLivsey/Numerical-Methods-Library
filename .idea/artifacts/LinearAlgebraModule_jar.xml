@@ -1,13 +1,8 @@
 <component name="ArtifactManager">
-  <artifact name="LinearAlgebraModule:jar">
+  <artifact type="jar" name="LinearAlgebraModule:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/LinearAlgebraModule_jar</output-path>
-    <root id="root">
-      <element id="archive" name="LinearAlgebraModule.jar">
-        <element id="directory" name="META-INF">
-          <element id="file-copy" path="$PROJECT_DIR$/out/META-INF/MANIFEST.MF" />
-        </element>
-        <element id="module-output" name="LinearAlgebraModule" />
-      </element>
+    <root id="archive" name="LinearAlgebraModule.jar">
+      <element id="module-output" name="LinearAlgebraModule" />
     </root>
   </artifact>
 </component>

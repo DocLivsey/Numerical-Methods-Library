@@ -19,8 +19,8 @@ public class Point2D {
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
-    public Point2D clone() throws CloneNotSupportedException
-    { return (Point2D) super.clone(); }
+    public Point2D clonePoint()
+    { return new Point2D(this.getX(), this.getY()); }
     public static  Point2D setXFromString(String xStr)
     {
         double x;
