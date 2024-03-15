@@ -1,3 +1,5 @@
+package OtherThings;
+
 public class PrettyOutput {
     public static final String RESET = "\u001B[0m";
     public static final String ERROR = "\u001B[31m"; // RED

@@ -1,6 +1,10 @@
+package LinearAlgebra;
+
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import OtherThings.*;
+
 public class Vector {
     protected double[] vector;
     protected int vectorSize;
@@ -137,7 +141,7 @@ public class Vector {
     }
     void writeInFile(String pathToFile) throws IOException {
         File output = new File(pathToFile);
-        FileWriter fileWriter = new FileWriter(output);
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(output));
         if (output.exists())
         {
             for (int i = 0; i < this.vectorSize; i++)
@@ -158,7 +162,7 @@ public class Vector {
     }
     void writeFormattedInFile(String pathToFile) throws IOException {
         File output = new File(pathToFile);
-        FileWriter fileWriter = new FileWriter(output);
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(output));
         if (output.exists())
         {
             for (int i = 0; i < this.vectorSize; i++)
@@ -191,7 +195,6 @@ public class Vector {
     }
     void writeInDesiredFolder(String pathToFolder, String fileName) throws IOException {
         String pathToFile = pathToFolder + "/" + fileName;
-        System.out.println(pathToFile);
         this.writeInFile(pathToFile);
     }
     void writeFormattedInDesiredFolder(String pathToFolder) throws IOException {

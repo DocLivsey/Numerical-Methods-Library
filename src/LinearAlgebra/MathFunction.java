@@ -1,3 +1,5 @@
+package LinearAlgebra;
+
 import java.util.*;
 @FunctionalInterface
 public interface MathFunction {

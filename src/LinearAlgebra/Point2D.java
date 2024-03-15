@@ -1,11 +1,13 @@
-import java.util.Comparator;
+package LinearAlgebra;
+
+import OtherThings.*;
 
 public class Point2D {
     protected double x;
     protected double y;
     Point2D()
     { this.x = Double.NaN; this.y = Double.NaN; }
-    Point2D(double x, double y)
+    public Point2D(double x, double y)
     { this.x = x; this.y = y; }
     public double getX() { return x; }
     public double getY() { return y; }
@@ -15,7 +17,7 @@ public class Point2D {
     { this.y = y; }
     @Override
     public String toString()
-    { return super.toString(); }
+    { return this.getX() + ";" + this.getY(); }
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
@@ -43,8 +45,8 @@ public class Point2D {
         }
         return new Point2D();
     }
-    public String pointToString()
-    { return "[" + this.getX() + ";" + this.getY() + "]"; }
+    public boolean isNullPoint()
+    { return Double.isNaN(this.getX()) || Double.isNaN(this.getY()); }
     public void print()
-    { System.out.println(PrettyOutput.OUTPUT + "{ " + this.x + "; " + this.y + " }" + PrettyOutput.RESET); }
+    { System.out.println(PrettyOutput.OUTPUT + "(" + this + ")" + PrettyOutput.RESET); }
 }

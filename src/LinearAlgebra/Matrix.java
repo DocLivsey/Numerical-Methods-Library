@@ -1,6 +1,10 @@
+package LinearAlgebra;
+
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import OtherThings.*;
+
 public class Matrix {
     protected int rowsCount;
     protected int columnsCount;
@@ -186,9 +190,10 @@ public class Matrix {
         }
         System.out.print(PrettyOutput.RESET);
     }
+    // REMAKE write in file methods
     void writeInFile(String pathToFile) throws IOException
     {
-        FileWriter fileWriter = new FileWriter(pathToFile);
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pathToFile));
         for (int i = 0; i < this.rowsCount; i++)
         {
             for (int j = 0; j < this.columnsCount; j++)
@@ -203,7 +208,7 @@ public class Matrix {
     }
     void writeFormattedInFile(String pathToFile) throws IOException
     {
-        FileWriter fileWriter = new FileWriter(pathToFile);
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pathToFile));
         for (int i = 0; i < this.rowsCount; i++)
         {
             for (int j = 0; j < this.columnsCount; j++)

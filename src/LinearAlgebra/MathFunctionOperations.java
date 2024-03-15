@@ -1,5 +1,8 @@
+package LinearAlgebra;
+
 import java.io.*;
 import java.util.*;
+import OtherThings.*;
 public class MathFunctionOperations extends MathBase {
     protected ArrayList<Double> arguments;
     protected ArrayList<Point2D> points;
@@ -21,7 +24,7 @@ public class MathFunctionOperations extends MathBase {
         this.readPointsFromFile(pathToPoints);
         this.expandPointsArea();
     }
-    MathFunctionOperations(ArrayList<Point2D> points, ArrayList<Double> arguments, MathFunction mathFunction)
+    public MathFunctionOperations(ArrayList<Point2D> points, ArrayList<Double> arguments, MathFunction mathFunction)
     {
         this.arguments = arguments;
         this.points = points;
@@ -162,9 +165,9 @@ public class MathFunctionOperations extends MathBase {
         {
             try
             {
-                FileWriter fileWriter = new FileWriter(pointsOutput);
+                BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pointsOutput));
                 for (Point2D point : this.points)
-                    fileWriter.write(point.pointToString() + "\n");
+                    fileWriter.write(point + "\n");
             } catch (IOException e) { System.out.println(e.getMessage()); }
         }
         else
