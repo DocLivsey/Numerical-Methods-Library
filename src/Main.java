@@ -1,10 +1,14 @@
 import java.io.*;
 import java.util.*;
+import java.nio.file.*;
 import LinearAlgebra.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-
+        String pathToFile = "input.txt";
+        List<String> linesList = Files.readAllLines(Paths.get(pathToFile));
+        for (var line : linesList)
+            System.out.println(line);
     }
     public static void functionExamplesForMain()
     {
