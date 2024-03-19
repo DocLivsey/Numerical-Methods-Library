@@ -154,7 +154,8 @@ public class Vector {
                     fileWriter.write(this.getItem(i) + " ");
             }
             else
-            { System.out.println("Файл не создан по указанному пути"); }
+            { throw new RuntimeException(PrettyOutput.ERROR + "Файл не создан по указанному пути: " +
+                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET); }
         }
         fileWriter.close();
     }
@@ -181,7 +182,8 @@ public class Vector {
                 }
             }
             else
-            { System.out.println("Файл не создан по указанному пути"); }
+            { throw new RuntimeException(PrettyOutput.ERROR + "Файл не создан по указанному пути: " +
+                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET); }
         }
         fileWriter.close();
     }
@@ -260,10 +262,7 @@ public class Vector {
     public Vector vectorAddition(Vector addVector)
     {
         if (this.vectorSize != addVector.getVectorSize())
-        {
-            System.out.println(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT + "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
-            return null;
-        }
+            throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT + "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
         else
         {
             double[] newVector = this.vector;
