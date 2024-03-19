@@ -1,8 +1,17 @@
 package LinearAlgebra;
 
+import OtherThings.*;
+
 public class MathBase {
-    protected final double epsilon = 1E-10;
-    public double getEpsilon() { return this.epsilon; }
+    protected String pathToArgumentsFile;
+    protected final static double epsilon = 1E-10;
+    public static double getEpsilon() { return epsilon; }
+    public static double[] setArguments(String pathToArgumentsFile)
+    {
+
+
+        return new double[]{};
+    }
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
