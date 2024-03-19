@@ -9,7 +9,7 @@ public class Matrix {
     protected int rowsCount;
     protected int columnsCount;
     protected double[][] matrix;
-    Matrix(String pathToFile) throws FileNotFoundException
+    public Matrix(String pathToFile) throws FileNotFoundException
     {
         File input = new File(pathToFile);
         Scanner whileScan = new Scanner(input);
@@ -39,7 +39,7 @@ public class Matrix {
             row[i] = Double.parseDouble(strArr[i]);
         this.setRow(row, 0);
     }
-    Matrix()
+    public Matrix()
     {
         System.out.println(PrettyOutput.INPUT + "Введите количество строк и столбцов в матрице:" + PrettyOutput.RESET);
         Scanner scan = new Scanner(System.in);
@@ -49,7 +49,7 @@ public class Matrix {
         this.columnsCount = columnsCount;
         this.matrix = new double[rowsCount][columnsCount];
     }
-    Matrix(int rowsCount, int columnsCount)
+    public Matrix(int rowsCount, int columnsCount)
     {
         this.rowsCount = rowsCount;
         this.columnsCount = columnsCount;
@@ -58,32 +58,32 @@ public class Matrix {
             for (int j = 0; j < this.columnsCount; j++)
                 this.setItem(i, j, Double.NaN);
     }
-    Matrix(double[][] matrix, int rowsCount, int columnsCount)
+    public Matrix(double[][] matrix, int rowsCount, int columnsCount)
     {
         this.rowsCount = rowsCount;
         this.columnsCount = columnsCount;
         this.matrix = matrix;
     }
-    int getRowsCount()
+    public int getRowsCount()
     { return this.rowsCount; }
-    int getColumnsCount()
+    public int getColumnsCount()
     { return this.columnsCount; }
-    double[][] getMatrix()
+    public double[][] getMatrix()
     { return this.matrix; }
-    double getItem (int indexRow, int indexColumn)
+    public double getItem (int indexRow, int indexColumn)
     { return this.matrix[indexRow][indexColumn]; }
-    void setMatrix(double[][] matrix)
+    public void setMatrix(double[][] matrix)
     { this.matrix = matrix; }
-    void setItem(int rowIndex, int colIndex, double replaceItem)
+    public void setItem(int rowIndex, int colIndex, double replaceItem)
     { this.matrix[rowIndex][colIndex] = replaceItem; }
-    void setRow(double[] row, int index)
+    public void setRow(double[] row, int index)
     {
         if (this.columnsCount != row.length)
         { System.out.println(PrettyOutput.ERROR + "Невозможно заменить строку в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
         else
             this.matrix[index] = row;
     }
-    void setColumn(double[] column, int index)
+    public void setColumn(double[] column, int index)
     {
         if (this.rowsCount != column.length)
         { System.out.println(PrettyOutput.ERROR + "Невозможно заменить столбец в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
@@ -93,7 +93,7 @@ public class Matrix {
     }
     public boolean equals(Object obj)
     { return super.equals(obj); }
-    Matrix cloneMatrix()
+    public Matrix cloneMatrix()
     {
         Matrix cloneMatrix = new Matrix(this.rowsCount, this.columnsCount);
         for (int i = 0; i < this.rowsCount; i++)
@@ -101,7 +101,7 @@ public class Matrix {
                 cloneMatrix.setItem(i, j, this.getItem(i, j));
         return cloneMatrix;
     }
-    void initializeMatrix()
+    protected void initializeMatrix()
     {
         Scanner scan = new Scanner(System.in);
         System.out.println(PrettyOutput.INPUT + "Введите элементы матрицы " + rowsCount + " на " + columnsCount + ":" + PrettyOutput.RESET);
@@ -112,14 +112,14 @@ public class Matrix {
                 this.setItem(i, j, a);
             }
     }
-    void initializeRandomMatrix(double from, double to)
+    protected void initializeRandomMatrix(double from, double to)
     {
         Random random = new Random();
         for (int i = 0; i < this.rowsCount; i++)
             for (int j = 0; j < this.columnsCount; j++)
                 this.setItem(i, j, random.nextDouble(from, to));
     }
-    void initializeRandomIntMatrix(int from, int to)
+    protected void initializeRandomIntMatrix(int from, int to)
     {
         Random random = new Random();
         for (int i = 0; i < this.rowsCount; i++)
@@ -162,7 +162,7 @@ public class Matrix {
         matrix.initializeRandomMatrix(from, to);
         return matrix;
     }
-    void printMatrix()
+    public void printMatrix()
     {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Матрица " + rowsCount + " на " + columnsCount + ":" + PrettyOutput.OUTPUT);
         for(int i = 0; i < this.rowsCount; i++)
@@ -175,7 +175,7 @@ public class Matrix {
         }
         System.out.print(PrettyOutput.RESET);
     }
-    void printFormattedMatrix()
+    public void printFormattedMatrix()
     {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Матрица " + rowsCount + " на " + columnsCount + ":" + PrettyOutput.OUTPUT);
         for(int i = 0; i < this.rowsCount; i++)
@@ -191,7 +191,7 @@ public class Matrix {
         System.out.print(PrettyOutput.RESET);
     }
     // REMAKE write in file methods
-    void writeInFile(String pathToFile) throws IOException
+    public void writeInFile(String pathToFile) throws IOException
     {
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pathToFile));
         for (int i = 0; i < this.rowsCount; i++)
@@ -206,7 +206,7 @@ public class Matrix {
         }
         fileWriter.close();
     }
-    void writeFormattedInFile(String pathToFile) throws IOException
+    public void writeFormattedInFile(String pathToFile) throws IOException
     {
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pathToFile));
         for (int i = 0; i < this.rowsCount; i++)
@@ -219,7 +219,7 @@ public class Matrix {
         }
         fileWriter.close();
     }
-    void addRow(double[] row)
+    public void addRow(double[] row)
     {
         if (row.length != this.columnsCount)
         { System.out.println(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
@@ -236,7 +236,7 @@ public class Matrix {
             this.matrix = newMatrix;
         }
     }
-    void addRowAfter (double[] row, int index)
+    public void addRowAfter (double[] row, int index)
     {
         if (row.length != this.columnsCount)
         { System.out.println(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
@@ -255,7 +255,7 @@ public class Matrix {
             this.matrix = newMatrix;
         }
     }
-    void deleteRow(int index)
+    public void deleteRow(int index)
     {
         if (index > this.rowsCount || index < 0)
         { System.out.println(PrettyOutput.ERROR + "Номер строки указан неверно" + PrettyOutput.RESET); }
@@ -273,7 +273,7 @@ public class Matrix {
             this.matrix = newMatrix.getMatrix();
         }
     }
-    void addColumn(double[] column)
+    public void addColumn(double[] column)
     {
         if (column.length != this.rowsCount)
         { System.out.println(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
@@ -291,7 +291,7 @@ public class Matrix {
             this.matrix = newMatrix;
         }
     }
-    void addColumnAfter (double[] column, int index)
+    public void addColumnAfter (double[] column, int index)
     {
         if (column.length != this.rowsCount)
         { System.out.println(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
@@ -313,7 +313,7 @@ public class Matrix {
             this.matrix = newMatrix;
         }
     }
-    void deleteColumn(int index)
+    public void deleteColumn(int index)
     {
         if (index > this.columnsCount || index < 0)
         { System.out.println(PrettyOutput.ERROR + "Номер столбца указан неверно" + PrettyOutput.RESET); }
@@ -334,7 +334,7 @@ public class Matrix {
             this.matrix = newMatrix.getMatrix();
         }
     }
-    Matrix partOfMatrix(int leftBorder, int rightBorder, int upBorder, int downBorder)
+    public Matrix partOfMatrix(int leftBorder, int rightBorder, int upBorder, int downBorder)
     {
         int newRowsCount = downBorder - upBorder + 1;
         int newColumnsCount = rightBorder - leftBorder + 1;
@@ -344,7 +344,7 @@ public class Matrix {
                 matrixPart[newRow][newCol] = this.getItem(oldRow, oldCol);
         return new Matrix(matrixPart, newRowsCount, newColumnsCount);
     }
-    Matrix matrixAddition(Matrix addMatrix)
+    public Matrix matrixAddition(Matrix addMatrix)
     {
         if (this.rowsCount != addMatrix.rowsCount || this.columnsCount != addMatrix.columnsCount)
         {
@@ -360,7 +360,7 @@ public class Matrix {
             return resultMatrix;
         }
     }
-    Matrix constantMultiplication(double constant)
+    public Matrix constantMultiplication(double constant)
     {
         double[][] newMatrix = this.matrix;
         for (int i = 0; i < this.rowsCount; i++)
@@ -368,14 +368,11 @@ public class Matrix {
             { newMatrix[i][j] *= constant; }
         return new Matrix(newMatrix, this.rowsCount, this.columnsCount);
     }
-    Matrix matrixMultiplication(Matrix addMatrix)
+    public Matrix matrixMultiplication(Matrix addMatrix)
     {
         if (this.columnsCount != addMatrix.getRowsCount())
-        {
-            System.out.println(PrettyOutput.ERROR + "Размеры матриц разные \n" + PrettyOutput.COMMENT +
+            throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц разные \n" + PrettyOutput.COMMENT +
                     "Пожалуйста, убедитесь, что количество столбцов первой матрицы равно количеству строк второй матрицы" + PrettyOutput.RESET);
-            return null;
-        }
         else
         {
             Matrix resultMatrix = new Matrix(this.rowsCount, addMatrix.getColumnsCount());
@@ -393,20 +390,17 @@ public class Matrix {
             return resultMatrix;
         }
     }
-    Vector matrixAndVectorMultiplication(Vector addVector)
+    public Vector matrixAndVectorMultiplication(Vector addVector)
     {
         Matrix vectorMatrix = addVector.vectorToMatrix();
         Vector resultVector;
         resultVector = this.matrixMultiplication(vectorMatrix).matrixToVector();
         return resultVector;
     }
-    Vector matrixToVector()
+    public Vector matrixToVector()
     {
         if (this.columnsCount != 1)
-        {
-            System.out.println(PrettyOutput.ERROR + "Преобразование из матрицы в вектор невозможно." + PrettyOutput.RESET);
-            return null;
-        }
+            throw new RuntimeException(PrettyOutput.ERROR + "Преобразование из матрицы в вектор невозможно." + PrettyOutput.RESET);
         else
         {
             double[] convertVector = new double[this.rowsCount];
@@ -415,7 +409,7 @@ public class Matrix {
             return new Vector(convertVector, this.rowsCount);
         }
     }
-    Matrix transposition()
+    public Matrix transposition()
     {
         double[][] transpositionMatrix = new double[this.columnsCount][this.rowsCount];
         for(int i = 0; i < this.columnsCount; i++)
@@ -424,13 +418,10 @@ public class Matrix {
         return new Matrix(transpositionMatrix, this.columnsCount, this.rowsCount);
     }
 
-    boolean isMatrixEqual(Matrix compareMatrix)
+    public boolean isMatrixEqual(Matrix compareMatrix)
     {
         if (this.rowsCount != compareMatrix.getRowsCount() || this.columnsCount != compareMatrix.getColumnsCount())
-        {
-            System.out.println(PrettyOutput.ERROR + "Размеры матриц разные" + PrettyOutput.RESET);
-            return false;
-        }
+            throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц разные" + PrettyOutput.RESET);
         else
         {
             for (int i = 0; i < this.rowsCount; i++)
@@ -440,13 +431,13 @@ public class Matrix {
             return true;
         }
     }
-    void swapRow(int indexChange, int indexChangeWith)
+    public void swapRow(int indexChange, int indexChangeWith)
     {
         double[] tmpRow = this.matrix[indexChange];
         this.matrix[indexChange] = this.matrix[indexChangeWith];
         this.matrix[indexChangeWith] = tmpRow;
     }
-    void swapColumn(int indexChange, int indexChangeWith)
+    public void swapColumn(int indexChange, int indexChangeWith)
     {
         for (int i = 0; i < this.rowsCount; i++)
         {
@@ -475,7 +466,7 @@ public class Matrix {
             }
         return cloneMatrix;
     }
-    double gaussianDeterminant()
+    public double gaussianDeterminant()
     {
         double[][] copyMatrix = new double[this.rowsCount][this.columnsCount];
         for (int i = 0; i < this.rowsCount; i++)
@@ -502,7 +493,7 @@ public class Matrix {
         { determinant *= tempMatrix.getItem(i, i); }
         return Math.round(determinant);
     }
-    double matrix2By2Determinant()
+    public double matrix2By2Determinant()
     {
         if (this.rowsCount != 2 || this.columnsCount != 2)
         {
@@ -517,7 +508,7 @@ public class Matrix {
             return firstTerm - secondTerm;
         }
     }
-    double matrix3By3Determinant()
+    public double matrix3By3Determinant()
     {
         if (this.rowsCount != 3 || this.columnsCount != 3)
         {
@@ -538,7 +529,7 @@ public class Matrix {
             return firstTerm + secondTerm + thirdTerm - fourthTerm - fifthTerm - sixthTerm;
         }
     }
-    double calculateDeterminant()
+    public double calculateDeterminant()
     {
         double determinant;
         if (this.rowsCount == 2 && this.columnsCount == 2)
@@ -549,14 +540,14 @@ public class Matrix {
             determinant = this.gaussianDeterminant();
         return determinant;
     }
-    Matrix setMinor(int rowIndex, int colIndex)
+    public Matrix setMinor(int rowIndex, int colIndex)
     {
         Matrix minor = this.cloneMatrix();
         minor.deleteRow(rowIndex);
         minor.deleteColumn(colIndex);
         return minor.cloneMatrix();
     }
-    Matrix inversion()
+    public Matrix inversion()
     {
         Matrix inversiveMatrix = new Matrix(this.rowsCount, this.columnsCount);
         if (this.rowsCount != this.columnsCount)
