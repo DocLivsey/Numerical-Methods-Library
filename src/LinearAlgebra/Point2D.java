@@ -50,7 +50,7 @@ public class Point2D {
         }
         return new Point2D();
     }
-    public Point2D readPointFromFile(String pathToFile) throws IOException {
+    public static Point2D readPointFromFile(String pathToFile) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(pathToFile));
         String pair = reader.readLine();
         return Point2D.setPairFromString(pair);
