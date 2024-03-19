@@ -2,6 +2,11 @@ package LinearAlgebra;
 
 import OtherThings.*;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+
 public class Point2D {
     protected double x;
     protected double y;
@@ -44,6 +49,11 @@ public class Point2D {
             return new Point2D(x, y);
         }
         return new Point2D();
+    }
+    public Point2D readPointFromFile(String pathToFile) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(pathToFile));
+        String pair = reader.readLine();
+        return Point2D.setPairFromString(pair);
     }
     public boolean isNullPoint()
     { return Double.isNaN(this.getX()) || Double.isNaN(this.getY()); }
