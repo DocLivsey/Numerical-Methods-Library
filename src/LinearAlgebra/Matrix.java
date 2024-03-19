@@ -79,14 +79,14 @@ public class Matrix {
     public void setRow(double[] row, int index)
     {
         if (this.columnsCount != row.length)
-        { System.out.println(PrettyOutput.ERROR + "Невозможно заменить строку в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно заменить строку в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
         else
             this.matrix[index] = row;
     }
     public void setColumn(double[] column, int index)
     {
         if (this.rowsCount != column.length)
-        { System.out.println(PrettyOutput.ERROR + "Невозможно заменить столбец в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно заменить столбец в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
         else
             for (int i = 0; i < this.rowsCount; i++)
                 this.setItem(i, index, column[i]);
@@ -222,7 +222,7 @@ public class Matrix {
     public void addRow(double[] row)
     {
         if (row.length != this.columnsCount)
-        { System.out.println(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
         else
         {
             this.rowsCount ++;
@@ -239,7 +239,7 @@ public class Matrix {
     public void addRowAfter (double[] row, int index)
     {
         if (row.length != this.columnsCount)
-        { System.out.println(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
         else
         {
             this.rowsCount ++;
@@ -258,7 +258,7 @@ public class Matrix {
     public void deleteRow(int index)
     {
         if (index > this.rowsCount || index < 0)
-        { System.out.println(PrettyOutput.ERROR + "Номер строки указан неверно" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Номер строки указан неверно" + PrettyOutput.RESET); }
         else
         {
             Matrix newMatrix = new Matrix(this.rowsCount - 1, this.columnsCount);
@@ -276,7 +276,7 @@ public class Matrix {
     public void addColumn(double[] column)
     {
         if (column.length != this.rowsCount)
-        { System.out.println(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
         else
         {
             this.columnsCount ++;
@@ -294,7 +294,7 @@ public class Matrix {
     public void addColumnAfter (double[] column, int index)
     {
         if (column.length != this.rowsCount)
-        { System.out.println(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
         else
         {
             this.columnsCount ++;
@@ -316,7 +316,7 @@ public class Matrix {
     public void deleteColumn(int index)
     {
         if (index > this.columnsCount || index < 0)
-        { System.out.println(PrettyOutput.ERROR + "Номер столбца указан неверно" + PrettyOutput.RESET); }
+        { throw new RuntimeException(PrettyOutput.ERROR + "Номер столбца указан неверно" + PrettyOutput.RESET); }
         else
         {
             Matrix newMatrix = new Matrix(this.rowsCount, this.columnsCount - 1);
@@ -347,10 +347,7 @@ public class Matrix {
     public Matrix matrixAddition(Matrix addMatrix)
     {
         if (this.rowsCount != addMatrix.rowsCount || this.columnsCount != addMatrix.columnsCount)
-        {
-            System.out.println(PrettyOutput.ERROR + "Размеры матриц разные \n" + PrettyOutput.COMMENT + "Пожалуйста, введите матрицы одного размера" + PrettyOutput.RESET);
-            return null;
-        }
+            throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц разные \n" + PrettyOutput.COMMENT + "Пожалуйста, введите матрицы одного размера" + PrettyOutput.RESET);
         else
         {
             Matrix resultMatrix = new Matrix(this.rowsCount, addMatrix.columnsCount);
@@ -457,7 +454,7 @@ public class Matrix {
                     for (int l = i; l < cloneMatrix.getRowsCount(); l++)
                     {
                         if (cloneMatrix.getItem(l, l) != 0) {cloneMatrix.swapRow(k, l);}
-                        else System.out.println(PrettyOutput.ERROR + "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
+                        else throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
                     }
                 }
                 double tmp = cloneMatrix.getItem(i, k) / cloneMatrix.getItem(k, k);
@@ -482,7 +479,7 @@ public class Matrix {
                     {
                         if (tempMatrix.getItem(l, l) != 0) {tempMatrix.swapRow(k, l); determinant *= -1;}
                         else if (tempMatrix.getItem(l, l) == 0 && l == this.rowsCount - 1)
-                            System.out.println(PrettyOutput.ERROR + "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
+                            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
                     }
                 }
                 double tmp = tempMatrix.getItem(i, k) / tempMatrix.getItem(k, k);
@@ -496,10 +493,7 @@ public class Matrix {
     public double matrix2By2Determinant()
     {
         if (this.rowsCount != 2 || this.columnsCount != 2)
-        {
-            System.out.println(PrettyOutput.ERROR + "Ошибка! Данный метод вычисления определителя работает только для матриц 2 на 2");
-            return  0;
-        }
+            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Данный метод вычисления определителя работает только для матриц 2 на 2");
         else
         {
             double firstTerm = this.getItem(0, 0) * this.getItem(1, 1);
@@ -511,10 +505,7 @@ public class Matrix {
     public double matrix3By3Determinant()
     {
         if (this.rowsCount != 3 || this.columnsCount != 3)
-        {
-            System.out.println(PrettyOutput.ERROR + "Ошибка! Данный метод вычисления определителя работает только для матриц 3 на 3");
-            return  0;
-        }
+            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Данный метод вычисления определителя работает только для матриц 3 на 3");
         else
         {
             double firstTerm = 1;
@@ -551,12 +542,12 @@ public class Matrix {
     {
         Matrix inversiveMatrix = new Matrix(this.rowsCount, this.columnsCount);
         if (this.rowsCount != this.columnsCount)
-            System.out.println(PrettyOutput.ERROR + "Ошибка! Матрица не квадратичная. Обратную невозможно посчитать" + PrettyOutput.RESET);
+            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Матрица не квадратичная. Обратную невозможно посчитать" + PrettyOutput.RESET);
         else
         {
             double determinant = this.calculateDeterminant();
             if (determinant == 0)
-                System.out.println(PrettyOutput.ERROR + "Заданная матрица Вырождена. Невозможно найти обратную" + PrettyOutput.RESET);
+                throw new RuntimeException(PrettyOutput.ERROR + "Заданная матрица Вырождена. Невозможно найти обратную" + PrettyOutput.RESET);
             else
             {
                 for (int i = 0; i < this.rowsCount; i++)
