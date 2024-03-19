@@ -92,18 +92,18 @@ public class MathFunctionOperations extends MathBase {
     public Point2D calculatePoint(double x)
     {
         this.setArgument(0, x);
-        if (Math.abs(this.mathFunction.function(this.arguments).getY()) < super.getEpsilon())
+        if (Math.abs(this.mathFunction.function(this.arguments).getY()) < getEpsilon())
             return new Point2D(x, 0);
         if (Math.abs(this.mathFunction.function(this.arguments).getY()) == Double.POSITIVE_INFINITY
                 || Double.isNaN(this.mathFunction.function(this.arguments).getY()))
-            return  new Point2D(x, 1 / super.getEpsilon());
+            return  new Point2D(x, 1 / getEpsilon());
         return this.mathFunction.function(this.arguments);
     }
     public double differential(Point2D point)
     {
-        double dx = point.getX() + super.getEpsilon();
+        double dx = point.getX() + getEpsilon();
         double dy = this.calculatePoint(dx).getY() - point.getY();
-        return dy / super.getEpsilon();
+        return dy / getEpsilon();
     }
     public double calculateStep(double leftBorder, double rightBorder)
     { return (rightBorder - leftBorder) / 2; }
@@ -169,8 +169,14 @@ public class MathFunctionOperations extends MathBase {
                 for (Point2D point : this.points)
                     fileWriter.write(point + "\n");
             } catch (IOException e) { System.out.println(e.getMessage()); }
-        }
-        else
+        } else if (pointsOutput.exists()) {
+            try
+            {
+                BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pointsOutput));
+                for (Point2D point : this.points)
+                    fileWriter.write(point + "\n");
+            } catch (IOException e) { System.out.println(e.getMessage()); }
+        } else
             throw new RuntimeException(PrettyOutput.ERROR + "Ошибка. Невозможно создать файл по заданному пути: " +
                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET);
     }
