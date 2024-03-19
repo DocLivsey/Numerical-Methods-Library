@@ -1,3 +1,4 @@
-kefawefmasskafm
-FEMFKMFKMFKMKMF
-qefkmfkmefkmwefkmewfmwef
+#   Another
+args = 1; value   = 1,
+ok = 0.001
+#   END
