@@ -163,19 +163,15 @@ public class MathFunctionOperations extends MathBase {
         File pointsOutput = new File(pathToFile);
         if (pointsOutput.createNewFile())
         {
-            try
-            {
-                BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pointsOutput));
-                for (Point2D point : this.points)
-                    fileWriter.write(point + "\n");
-            } catch (IOException e) { System.out.println(e.getMessage()); }
+            FileWriter fileWriter = new FileWriter(pointsOutput);
+            for (Point2D point : this.points)
+                fileWriter.write(point + "\n");
+            fileWriter.close();
         } else if (pointsOutput.exists()) {
-            try
-            {
-                BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pointsOutput));
-                for (Point2D point : this.points)
-                    fileWriter.write(point + "\n");
-            } catch (IOException e) { System.out.println(e.getMessage()); }
+            FileWriter fileWriter = new FileWriter(pointsOutput);
+            for (Point2D point : this.points)
+                fileWriter.write(point + "\n");
+            fileWriter.close();
         } else
             throw new RuntimeException(PrettyOutput.ERROR + "Ошибка. Невозможно создать файл по заданному пути: " +
                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET);

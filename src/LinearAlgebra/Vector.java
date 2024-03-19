@@ -141,14 +141,12 @@ public class Vector {
     }
     public void writeInFile(String pathToFile) throws IOException {
         File output = new File(pathToFile);
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(output));
+        FileWriter fileWriter = new FileWriter(output);
         if (output.exists())
         {
             for (int i = 0; i < this.vectorSize; i++)
                 fileWriter.write(this.getItem(i) + " ");
-        }
-        else
-        {
+        } else {
             boolean created = output.createNewFile();
             if (created)
             {
@@ -162,7 +160,7 @@ public class Vector {
     }
     public void writeFormattedInFile(String pathToFile) throws IOException {
         File output = new File(pathToFile);
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(output));
+        FileWriter fileWriter = new FileWriter(output);
         if (output.exists())
         {
             for (int i = 0; i < this.vectorSize; i++)
@@ -171,9 +169,7 @@ public class Vector {
                 String result = shortOut.format(this.getItem(i));
                 fileWriter.write(result + " ");
             }
-        }
-        else
-        {
+        } else {
             boolean created = output.createNewFile();
             if (created)
             {

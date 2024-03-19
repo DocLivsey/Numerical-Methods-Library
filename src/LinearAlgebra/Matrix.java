@@ -193,7 +193,7 @@ public class Matrix {
     // REMAKE write in file methods
     public void writeInFile(String pathToFile) throws IOException
     {
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pathToFile));
+        FileWriter fileWriter = new FileWriter(pathToFile);
         for (int i = 0; i < this.rowsCount; i++)
         {
             for (int j = 0; j < this.columnsCount; j++)
@@ -208,7 +208,7 @@ public class Matrix {
     }
     public void writeFormattedInFile(String pathToFile) throws IOException
     {
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(pathToFile));
+        FileWriter fileWriter = new FileWriter(pathToFile);
         for (int i = 0; i < this.rowsCount; i++)
         {
             for (int j = 0; j < this.columnsCount; j++)
