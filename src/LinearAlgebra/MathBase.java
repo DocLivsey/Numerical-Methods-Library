@@ -3,7 +3,7 @@ package LinearAlgebra;
 import OtherThings.*;
 
 public class MathBase {
-    protected String pathToArgumentsFile;
+    protected String pathToParametersFile;
     protected final static double epsilon = 1E-10;
     public static double getEpsilon() { return epsilon; }
     public static double[] setArguments(String pathToArgumentsFile)
