@@ -8,7 +8,7 @@ import OtherThings.*;
 public class Vector {
     protected double[] vector;
     protected int vectorSize;
-    Vector(String pathToFile) throws FileNotFoundException
+    public Vector(String pathToFile) throws FileNotFoundException
     {
         File input = new File(pathToFile);
         Scanner scan = new Scanner(input);
@@ -20,19 +20,19 @@ public class Vector {
         for (int i = 0; i < strArr.length; i++)
             this.vector[i] = Double.parseDouble(strArr[i]);
     }
-    Vector(double[] vector, int vectorSize)
+    public Vector(double[] vector, int vectorSize)
     {
         this.vector = vector;
         this.vectorSize = vectorSize;
     }
-    Vector(int vectorSize)
+    public Vector(int vectorSize)
     {
         this.vectorSize = vectorSize;
         this.vector = new double[vectorSize];
         for (int i = 0; i < this.vectorSize; i++)
             this.setItem(i, Double.NaN);
     }
-    Vector()
+    public Vector()
     {
         Scanner scan = new Scanner(System.in);
         System.out.println(PrettyOutput.INPUT + "Введите размер вектора:" + PrettyOutput.RESET);
@@ -41,7 +41,7 @@ public class Vector {
         this.vectorSize = vectorSize;
         this.vector = new double[vectorSize];
     }
-    void initializeVector()
+    protected void initializeVector()
     {
         Scanner scan = new Scanner(System.in);
         System.out.println(PrettyOutput.INPUT + "Введите элементы вектора размерностью " + vectorSize + ":" + PrettyOutput.RESET);
@@ -51,24 +51,24 @@ public class Vector {
             this.vector[i] = a;
         }
     }
-    void initializeRandomVector(double from, double to)
+    protected void initializeRandomVector(double from, double to)
     {
         Random random = new Random();
         for (int i = 0; i < this.vectorSize; i++)
             this.vector[i] = random.nextDouble(from, to);
     }
-    void initializeRandomIntVector(int from, int to)
+    protected void initializeRandomIntVector(int from, int to)
     {
         Random random = new Random();
         for (int i = 0; i < this.vectorSize; i++)
             this.vector[i] = random.nextInt(from, to);
     }
-    int getVectorSize() { return this.vectorSize; }
-    double[] getVector() { return this.vector; }
-    double getItem(int index) { return this.vector[index]; }
-    void setItem(int index, double replaceItem)
+    public int getVectorSize() { return this.vectorSize; }
+    public double[] getVector() { return this.vector; }
+    public double getItem(int index) { return this.vector[index]; }
+    public void setItem(int index, double replaceItem)
     { this.vector[index] = replaceItem; }
-    void setVector(double[] vector)
+    public void setVector(double[] vector)
     {
         System.out.println(PrettyOutput.CHOOSE + "Вы уверены, что хотите заменить вектор?" + PrettyOutput.RESET);
         this.vector = vector;
@@ -119,7 +119,7 @@ public class Vector {
         vector.initializeRandomVector(from, to);
         return vector;
     }
-    void printVector()
+    public void printVector()
     {
         System.out.print(PrettyOutput.HEADER_OUTPUT + "\nВектор размерностью " + vectorSize + PrettyOutput.OUTPUT + ": \n { ");
         for (int i = 0; i < vectorSize; i++)
@@ -128,7 +128,7 @@ public class Vector {
         }
         System.out.println("}" + PrettyOutput.RESET);
     }
-    void printFormattedVector()
+    public void printFormattedVector()
     {
         System.out.print(PrettyOutput.HEADER_OUTPUT + "\nВектор размерностью " + vectorSize + PrettyOutput.OUTPUT + ": \n { ");
         for (int i = 0; i < vectorSize; i++)
@@ -139,7 +139,7 @@ public class Vector {
         }
         System.out.println("}" + PrettyOutput.RESET);
     }
-    void writeInFile(String pathToFile) throws IOException {
+    public void writeInFile(String pathToFile) throws IOException {
         File output = new File(pathToFile);
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(output));
         if (output.exists())
@@ -160,7 +160,7 @@ public class Vector {
         }
         fileWriter.close();
     }
-    void writeFormattedInFile(String pathToFile) throws IOException {
+    public void writeFormattedInFile(String pathToFile) throws IOException {
         File output = new File(pathToFile);
         BufferedWriter fileWriter = new BufferedWriter(new FileWriter(output));
         if (output.exists())
@@ -189,23 +189,23 @@ public class Vector {
         }
         fileWriter.close();
     }
-    void writeInDesiredFolder(String pathToFolder) throws IOException {
+    public void writeInDesiredFolder(String pathToFolder) throws IOException {
         String pathToFile = pathToFolder + "/output.txt";
         this.writeInFile(pathToFile);
     }
-    void writeInDesiredFolder(String pathToFolder, String fileName) throws IOException {
+    public void writeInDesiredFolder(String pathToFolder, String fileName) throws IOException {
         String pathToFile = pathToFolder + "/" + fileName;
         this.writeInFile(pathToFile);
     }
-    void writeFormattedInDesiredFolder(String pathToFolder) throws IOException {
+    public void writeFormattedInDesiredFolder(String pathToFolder) throws IOException {
         String pathToFile = pathToFolder + "/output.txt";
         this.writeFormattedInFile(pathToFile);
     }
-    void writeFormattedInDesiredFolder(String pathToFolder, String fileName) throws IOException {
+    public void writeFormattedInDesiredFolder(String pathToFolder, String fileName) throws IOException {
         String pathToFile = pathToFolder + "/" + fileName;
         this.writeFormattedInFile(pathToFile);
     }
-    void addItem(double item)
+    public void addItem(double item)
     {
         this.vectorSize ++;
         double[] newVector = new double[this.vectorSize];
@@ -218,7 +218,7 @@ public class Vector {
         }
         this.vector = newVector;
     }
-    void addItemBefore(double item, int index)
+    public void addItemBefore(double item, int index)
     {
         this.vectorSize ++;
         double[] newVector = new double[this.vectorSize];
@@ -232,7 +232,7 @@ public class Vector {
         }
         this.vector = newVector;
     }
-    void addItemAfter(double item, int index)
+    public void addItemAfter(double item, int index)
     {
         this.vectorSize ++;
         double[] newVector = new double[this.vectorSize];
@@ -246,7 +246,7 @@ public class Vector {
         }
         this.vector = newVector;
     }
-    Vector partOfVector(int leftBorder, int rightBorder)
+    public Vector partOfVector(int leftBorder, int rightBorder)
     {
         int newVectorSize = rightBorder - leftBorder + 1;
         double[] vectorPart = new double[newVectorSize];
@@ -254,14 +254,14 @@ public class Vector {
             vectorPart[newIndex] = this.getItem(oldIndex);
         return new Vector(vectorPart, newVectorSize);
     }
-    Vector constantMultiplication(double constant)
+    public Vector constantMultiplication(double constant)
     {
         double[] newVector = this.vector;
         for (int i = 0; i < this.vectorSize; i++)
             newVector[i] *= constant;
         return new Vector(newVector,this.vectorSize);
     }
-    Vector vectorAddition(Vector addVector)
+    public Vector vectorAddition(Vector addVector)
     {
         if (this.vectorSize != addVector.getVectorSize())
         {
@@ -276,40 +276,39 @@ public class Vector {
             return new Vector(newVector,this.vectorSize);
         }
     }
-    Vector vectorDifference(Vector subtractVector)
+    public Vector vectorDifference(Vector subtractVector)
     {
         subtractVector = subtractVector.constantMultiplication(-1);
         Vector resultVector;
         resultVector = this.vectorAddition(subtractVector);
         return resultVector;
     }
-    boolean isInVector(double item)
+    public boolean isInVector(double item)
     {
         for (double i : this.vector)
             if (i == item) return true;
         return false;
     }
-    Matrix vectorToMatrix()
+    public Matrix vectorToMatrix()
     {
         double[][] convertMatrix = new double[this.vectorSize][1];
         for (int i = 0; i < this.vectorSize; i++)
             convertMatrix[i][0] = this.getItem(i);
         return new Matrix(convertMatrix, this.vectorSize, 1);
     }
-    double ChebyshevNorm()
+    public double ChebyshevNorm()
     {
         double result = 0;
         for (double i : this.vector)
             result = Math.max(Math.abs(i), Math.abs(result));
         return result;
     }
-    void sort()
+    public void sort()
     { Arrays.sort(this.vector); }
     public boolean isZeroVector()
     {
-        MathBase base = new MathBase();
         for (double item : this.vector)
-            if (item != 0 && Math.abs(item) > base.getEpsilon())
+            if (item != 0 && Math.abs(item) > MathBase.getEpsilon())
                 return false;
         return true;
     }
