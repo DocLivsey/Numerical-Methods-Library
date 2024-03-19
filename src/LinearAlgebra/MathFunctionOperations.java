@@ -7,7 +7,7 @@ public class MathFunctionOperations extends MathBase {
     protected ArrayList<Double> arguments;
     protected ArrayList<Point2D> points;
     protected MathFunction mathFunction;
-    MathFunctionOperations(String pathToPoints, ArrayList<Double> arguments, MathFunction mathFunction) throws FileNotFoundException
+    public MathFunctionOperations(String pathToPoints, ArrayList<Double> arguments, MathFunction mathFunction) throws FileNotFoundException
     {
         this.arguments = arguments;
         this.points = new ArrayList<>();
@@ -17,7 +17,7 @@ public class MathFunctionOperations extends MathBase {
         if (this.isAnyNullValuesInPoints())
             this.calculateNullValues();
     }
-    MathFunctionOperations(String pathToPoints, ArrayList<Double> arguments) throws FileNotFoundException
+    public MathFunctionOperations(String pathToPoints, ArrayList<Double> arguments) throws FileNotFoundException
     {
         this.arguments = arguments;
         this.points = new ArrayList<>();
@@ -33,9 +33,9 @@ public class MathFunctionOperations extends MathBase {
         if (this.isAnyNullValuesInPoints())
             this.calculateNullValues();
     }
-    MathFunctionOperations(ArrayList<Point2D> points)
+    public MathFunctionOperations(ArrayList<Point2D> points)
     { this.points = points; this.expandPointsArea(); }
-    MathFunctionOperations()
+    public MathFunctionOperations()
     {
         this.points = new ArrayList<>();
         this.mathFunction = x -> new Point2D(Double.NaN, Double.NaN);
@@ -71,7 +71,7 @@ public class MathFunctionOperations extends MathBase {
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
-    protected MathFunctionOperations cloneMathFunction()
+    public MathFunctionOperations cloneMathFunction()
     { return new MathFunctionOperations(this.points, this.arguments, this.mathFunction); }
     public void sortPoints()
     { this.points.sort(Comparator.comparingDouble(Point2D::getX)); }
@@ -107,7 +107,7 @@ public class MathFunctionOperations extends MathBase {
     }
     public double calculateStep(double leftBorder, double rightBorder)
     { return (rightBorder - leftBorder) / 2; }
-    public void expandPointsArea()
+    protected void expandPointsArea()
     {
         double leftBorder = this.getPoint(0).getX();
         double rightBorder = this.getPoint(this.points.size() - 1).getX();
@@ -171,7 +171,7 @@ public class MathFunctionOperations extends MathBase {
             } catch (IOException e) { System.out.println(e.getMessage()); }
         }
         else
-            System.out.println(PrettyOutput.ERROR + "Ошибка. Невозможно создать файл по заданному пути: " +
+            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка. Невозможно создать файл по заданному пути: " +
                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET);
     }
 }

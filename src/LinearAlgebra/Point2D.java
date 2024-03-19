@@ -5,7 +5,7 @@ import OtherThings.*;
 public class Point2D {
     protected double x;
     protected double y;
-    Point2D()
+    public Point2D()
     { this.x = Double.NaN; this.y = Double.NaN; }
     public Point2D(double x, double y)
     { this.x = x; this.y = y; }
@@ -23,7 +23,7 @@ public class Point2D {
     { return super.equals(obj); }
     public Point2D clonePoint()
     { return new Point2D(this.getX(), this.getY()); }
-    public static  Point2D setXFromString(String xStr)
+    public static Point2D setXFromString(String xStr)
     {
         double x;
         if (MathBase.isNumeric(xStr))
