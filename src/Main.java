@@ -6,8 +6,11 @@ import Parsers.FileParser;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        String pathToFile = "input.txt";
-        System.out.println(FileParser.ParseSettings.getParametersTable(pathToFile));
+        String pathToFile = "output.txt";
+        FileWriter writer = new FileWriter(new File(pathToFile));
+        for (double i = 0; i < 10; i +=0.5)
+            writer.write(String.valueOf(i));
+        writer.close();
     }
     public static void functionExamplesForMain()
     {
