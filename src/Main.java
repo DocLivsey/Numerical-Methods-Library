@@ -9,7 +9,10 @@ import Parsers.FileParser;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        functionExamplesForMain();
+        String pathToInputFile = "input.txt";
+        MathBase base = new MathBase();
+        base.updateVariablesList(List.of("step of method"));
+        System.out.println(base.getVariablesTable(pathToInputFile));
     }
     public static void functionExamplesForMain() throws IOException {
         String pathToInputFile = "input.txt";

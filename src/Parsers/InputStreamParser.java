@@ -33,6 +33,8 @@ public class InputStreamParser {
     public static boolean stringMatchesAnyItemOfList(Collection<String> collection, String string, String regex)
     {
         string = string.replaceAll(regex, "");
+        collection = collection.stream().map(item -> item.toLowerCase().replaceAll(
+                regex, "")).collect(Collectors.toList());
         for (String item : collection)
         {
             Pattern pattern = Pattern.compile(item, Pattern.CASE_INSENSITIVE);

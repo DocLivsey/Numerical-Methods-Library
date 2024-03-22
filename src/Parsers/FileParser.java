@@ -53,21 +53,6 @@ public class FileParser {
                 }
             }
         }
-        protected static HashMap<Settings, String> getSettingsPartTable(
-                String pathToSettingsFile) throws IOException {
-            HashMap<Settings, String> settingsPartTable = new HashMap<>();
-            List<String> fileText = Files.readAllLines(Paths.get(pathToSettingsFile));
-            for (Settings setting : fileSettings)
-            {
-                if (settingsAssociativeTable.containsKey(setting))
-                    settingsPartTable.put(setting, selectCertainSettingPartOfFile(
-                        fileText, settingsAssociativeTable.get(setting)));
-                else
-                    settingsPartTable.put(setting, selectCertainSettingPartOfFile(
-                            fileText, new LinkedList<>()));
-            }
-            return settingsPartTable;
-        }
         protected static String selectCertainSettingPartOfFile(
                 List<String> textOfFile, Collection<String> settings)
         {
@@ -83,11 +68,13 @@ public class FileParser {
                     {
                         String nextString = iterator.next();
                         settingsPartList.add(currString);
-                        while (!settingLinePattern.matcher(nextString).matches() && iterator.hasNext())
+                        while (!settingLinePattern.matcher(nextString).matches())
                         {
                             settingsPartList.add(nextString);
                             settingsPart.append(nextString);
-                            nextString = iterator.next();
+                            if (iterator.hasNext())
+                                nextString = iterator.next();
+                            else break;
                         }
                         break;
                     }
@@ -95,13 +82,27 @@ public class FileParser {
             textOfFile.removeAll(settingsPartList);
             return settingsPart.toString();
         }
+        protected static HashMap<Settings, String> getSettingsPartTable(
+                String pathToSettingsFile) throws IOException {
+            HashMap<Settings, String> settingsPartTable = new HashMap<>();
+            List<String> fileText = Files.readAllLines(Paths.get(pathToSettingsFile));
+            for (Settings setting : fileSettings)
+            {
+                if (settingsAssociativeTable.containsKey(setting))
+                    settingsPartTable.put(setting, selectCertainSettingPartOfFile(
+                            fileText, settingsAssociativeTable.get(setting)));
+                else
+                    settingsPartTable.put(setting, selectCertainSettingPartOfFile(
+                            fileText, new LinkedList<>()));
+            }
+            return settingsPartTable;
+        }
         public static HashMap<String, Double> getParametersTable(String pathToSettingsFile) throws IOException {
             try {
                 setSettings(pathToSettingsFile);
             } catch (RuntimeException exception) {
                 System.out.println(exception.getMessage());
             }
-            System.out.println(fileSettings);
             HashMap<Settings, String> settingsPartTable = getSettingsPartTable(pathToSettingsFile);
             HashMap<String, Double> parametersTable = new HashMap<>();
             if (settingsPartTable.containsKey(Settings.PARAMETERS))
@@ -110,9 +111,12 @@ public class FileParser {
                 String[] parameters = parametersPart.split(";");
                 for (var parameter : parameters)
                 {
-                    String name = parameter.split("=")[0].strip();
-                    double value = Double.parseDouble(parameter.split("=")[1].strip());
-                    parametersTable.put(name, value);
+                    if (!parameter.isEmpty())
+                    {
+                        String name = parameter.split("=")[0].strip();
+                        double value = Double.parseDouble(parameter.split("=")[1].strip());
+                        parametersTable.put(name, value);
+                    }
                 }
             } else
                 throw new RuntimeException(PrettyOutput.ERROR +

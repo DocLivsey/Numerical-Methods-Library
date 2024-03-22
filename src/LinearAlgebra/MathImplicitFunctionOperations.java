@@ -15,6 +15,7 @@ public class MathImplicitFunctionOperations extends MathBase {
         if (pathToParametersFile != null)
             this.setEpsilon(pathToParametersFile);
         if (pathToPoints != null) {
+            this.points = new ArrayList<>();
             this.readPointsFromFile(pathToPoints);
         } else this.points = Objects.requireNonNullElseGet(points, ArrayList::new);
         if (function != null) {

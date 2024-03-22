@@ -1,6 +1,2 @@
-# smkfkasmfk   PARAMeter asekfmasmf
-value = 1; epsi lon = 1E-5;
-# comment
-Epsilon = 1010010;
-# config
-jfhj
+# param
+step of method = 0.5;

@@ -26,7 +26,7 @@ public class MathBase {
     @Override
     public String toString()
     { return super.toString(); }
-    protected void updateVariablesList(Collection<String> collection)
+    public void updateVariablesList(Collection<String> collection)
     { this.variablesList.addAll(collection); }
     public static boolean isNumeric(String string)
     {
