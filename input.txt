@@ -1,4 +1,6 @@
-#   Another
-args = 1; value   = 1,
-ok = 0.001
-#   END
+# smkfkasmfk   PARAMeter asekfmasmf
+value = 1; epsi lon = 1E-5;
+# comment
+Epsilon = 1010010;
+# config
+jfhj

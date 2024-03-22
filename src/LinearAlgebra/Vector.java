@@ -303,7 +303,7 @@ public class Vector {
     public boolean isZeroVector()
     {
         for (double item : this.vector)
-            if (item != 0 && Math.abs(item) > MathBase.getEpsilon())
+            if (item != 0 && Math.abs(item) > 1E-10)
                 return false;
         return true;
     }

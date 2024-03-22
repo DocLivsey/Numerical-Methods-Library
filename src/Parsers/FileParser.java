@@ -8,77 +8,111 @@ import java.nio.file.*;
 import java.util.regex.*;
 
 public class FileParser {
-    public static class ParseSettings {
+    public static class SettingsParser {
         public enum Settings {
-            PARAMETERS, CONFIGURATIONS,
+            ARGUMENTS_FIELDS, PARAMETERS, CONFIGURATIONS,
             NOT_A_SETTINGS;
         }
-        protected static Settings settings;
+        protected static boolean isSettingsUpload = false;
+        protected static LinkedList<Settings> fileSettings = new LinkedList<>();
         protected static HashMap<String, Settings> settingsTable = new HashMap<>(){{
-            this.put("config", Settings.CONFIGURATIONS);
-            this.put("argument", Settings.PARAMETERS);
             this.put("param", Settings.PARAMETERS);
+            this.put("config", Settings.CONFIGURATIONS);
+            this.put("fields", Settings.ARGUMENTS_FIELDS);
+            this.put("argument", Settings.ARGUMENTS_FIELDS);
         }};
+        protected static HashMap<Settings, LinkedList<String>> settingsAssociativeTable = new HashMap<>(){{
+            for (var association : settingsTable.entrySet())
+            {
+                if (this.containsKey(association.getValue()))
+                    this.get(association.getValue()).add(association.getKey());
+                else
+                    this.put(association.getValue(), new LinkedList<>(List.of(association.getKey())));
+            }
+        }};
+        public static LinkedList<Settings> getFileSettings() {
+            return fileSettings;
+        }
         public static void setSettings(String pathToSettingsFile) throws IOException {
+            if (!fileSettings.isEmpty())
+                throw new RuntimeException(PrettyOutput.ERROR + "Конфигурация файла " + PrettyOutput.COMMENT +
+                        pathToSettingsFile + PrettyOutput.ERROR + " уже установлена" + PrettyOutput.RESET);
             List<String> linesList = Files.readAllLines(Paths.get(pathToSettingsFile));
             Pattern settingLinePattern = Pattern.compile("^#+[\\w\\s]+");
             for (var line : linesList)
             {
-                Matcher matchLinePattern = settingLinePattern.matcher(line);
-                if (matchLinePattern.matches())
+                if (settingLinePattern.matcher(line).matches())
                 {
-                    for (var key : settingsTable.keySet())
+                    if (InputStreamParser.anyItemOfListFindsInString(settingsTable.keySet(), line))
                     {
-                        String[] words = line.split("\\s+");
-                        if (InputStreamParser.containsInText(key, words))
-                        {
-                            settings = settingsTable.get(key);
-                            break;
-                        } else settings = Settings.NOT_A_SETTINGS;
-                    }
-                    break;
+                        Collection<String> inString = InputStreamParser.listItemsInString(settingsTable.keySet(), line);
+                        for (var item : inString)
+                            fileSettings.add(settingsTable.get(item));
+                    } else
+                        fileSettings.add(Settings.NOT_A_SETTINGS);
                 }
             }
         }
-        protected static LinkedList<String> selectSettingsPartOfFile(String pathToSettingsFile) throws IOException {
-            LinkedList<String> settingsPart = new LinkedList<>();
-            Pattern settingLinePattern = Pattern.compile("^#+[\\w\\s]+");
-            List<String> linesList = Files.readAllLines(Paths.get(pathToSettingsFile));
-            for (int i = 0; i < linesList.size(); i++)
+        protected static HashMap<Settings, String> getSettingsPartTable(
+                String pathToSettingsFile) throws IOException {
+            HashMap<Settings, String> settingsPartTable = new HashMap<>();
+            List<String> fileText = Files.readAllLines(Paths.get(pathToSettingsFile));
+            for (Settings setting : fileSettings)
             {
-                Matcher matchLinePattern = settingLinePattern.matcher(linesList.get(i));
-                if (matchLinePattern.matches())
-                {
-                    int j = i + 1;
-                    matchLinePattern = settingLinePattern.matcher(linesList.get(j));
-                    while (!matchLinePattern.matches())
-                    {
-                        settingsPart.add(linesList.get(j));
-                        j++;
-                        if (j >= linesList.size())
-                            break;
-                        matchLinePattern = settingLinePattern.matcher(linesList.get(j));
-                    }
-                    break;
-                }
+                if (settingsAssociativeTable.containsKey(setting))
+                    settingsPartTable.put(setting, selectCertainSettingPartOfFile(
+                        fileText, settingsAssociativeTable.get(setting)));
+                else
+                    settingsPartTable.put(setting, selectCertainSettingPartOfFile(
+                            fileText, new LinkedList<>()));
             }
-            return settingsPart;
+            return settingsPartTable;
+        }
+        protected static String selectCertainSettingPartOfFile(
+                List<String> textOfFile, Collection<String> settings)
+        {
+            StringBuilder settingsPart = new StringBuilder();
+            LinkedList<String> settingsPartList = new LinkedList<>();
+            ListIterator<String> iterator = textOfFile.listIterator();
+            while (iterator.hasNext())
+            {
+                String currString = iterator.next();
+                Pattern settingLinePattern = Pattern.compile("^#+[\\w\\s]+");
+                if (settingLinePattern.matcher(currString).matches())
+                    if (InputStreamParser.anyItemOfListFindsInString(settings, currString))
+                    {
+                        String nextString = iterator.next();
+                        settingsPartList.add(currString);
+                        while (!settingLinePattern.matcher(nextString).matches() && iterator.hasNext())
+                        {
+                            settingsPartList.add(nextString);
+                            settingsPart.append(nextString);
+                            nextString = iterator.next();
+                        }
+                        break;
+                    }
+            }
+            textOfFile.removeAll(settingsPartList);
+            return settingsPart.toString();
         }
         public static HashMap<String, Double> getParametersTable(String pathToSettingsFile) throws IOException {
-            LinkedList<String> settingsPart = selectSettingsPartOfFile(pathToSettingsFile);
+            try {
+                setSettings(pathToSettingsFile);
+            } catch (RuntimeException exception) {
+                System.out.println(exception.getMessage());
+            }
+            System.out.println(fileSettings);
+            HashMap<Settings, String> settingsPartTable = getSettingsPartTable(pathToSettingsFile);
             HashMap<String, Double> parametersTable = new HashMap<>();
-            setSettings(pathToSettingsFile);
-            if (settings == Settings.PARAMETERS)
+            if (settingsPartTable.containsKey(Settings.PARAMETERS))
             {
-                for (var settingsString : settingsPart)
+                String parametersPart = settingsPartTable.get(Settings.PARAMETERS);
+                String[] parameters = parametersPart.split(";");
+                for (var parameter : parameters)
                 {
-                    String[] parameters = settingsString.split("[,;]");
-                    for (var parameter : parameters)
-                    {
-                        String name = parameter.split("=")[0].strip();
-                        double value = Double.parseDouble(parameter.split("=")[1].strip());
-                        parametersTable.put(name, value);
-                    }
+                    String name = parameter.split("=")[0].strip();
+                    double value = Double.parseDouble(parameter.split("=")[1].strip());
+                    parametersTable.put(name, value);
                 }
             } else
                 throw new RuntimeException(PrettyOutput.ERROR +
@@ -100,5 +134,4 @@ public class FileParser {
                         PrettyOutput.COMMENT + settings + PrettyOutput.RESET);
         } // добавление по значению из Settings нового синонима в список синонимов
     }
-
 }

@@ -1,16 +1,21 @@
 package LinearAlgebra;
 
 import OtherThings.*;
+import Parsers.*;
+
+import java.io.*;
+import java.util.*;
 
 public class MathBase {
-    protected String pathToParametersFile;
-    protected final static double epsilon = 1E-10;
-    public static double getEpsilon() { return epsilon; }
-    public static double[] setArguments(String pathToArgumentsFile)
-    {
-
-
-        return new double[]{};
+    protected final LinkedList<String> variablesList = new LinkedList<>(List.of("epsilon"));
+    public HashMap<String, Double> getVariablesTable(String pathToSettingsFile) throws IOException {
+        HashMap<String, Double> variablesTable = new HashMap<>();
+        HashMap<String, Double> parametersTable = FileParser.SettingsParser.getParametersTable(pathToSettingsFile);
+        String replaceRegex = "[_\\s+]";
+        for (var parameter : parametersTable.keySet())
+            if (InputStreamParser.stringMatchesAnyItemOfList(this.variablesList, parameter, replaceRegex))
+                variablesTable.put(parameter.replaceAll(replaceRegex, ""), parametersTable.get(parameter));
+        return variablesTable;
     }
     @Override
     public boolean equals(Object obj)
@@ -21,6 +26,8 @@ public class MathBase {
     @Override
     public String toString()
     { return super.toString(); }
+    protected void updateVariablesList(Collection<String> collection)
+    { this.variablesList.addAll(collection); }
     public static boolean isNumeric(String string)
     {
         if(string == null || string.isEmpty()) {
