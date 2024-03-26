@@ -77,16 +77,20 @@ public class InputStreamParser {
         }
         return false;
     }
-    public static Collection<String> listItemsInString(Collection<String> collection, String string)
+    public static<T> Collection<T> listItemsInString(Collection<T> collection, String string)
     {
-        Collection<String> inString = new ArrayList<>();
-        for (String item : collection)
+        Collection<T> inString = new ArrayList<>();
+        for (T item : collection)
         {
             Matcher matcher = Pattern.compile(item + "\\w*", Pattern.CASE_INSENSITIVE).matcher(string);
             if (matcher.find())
                 inString.add(item);
         }
         return inString;
+    }
+    public static <T, F> T parseGeneric(F from)
+    {
+        return null;
     }
 }
 

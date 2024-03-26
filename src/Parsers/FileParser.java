@@ -1,8 +1,11 @@
 package Parsers;
 
 import OtherThings.PrettyOutput;
+import OtherThings.Procedure;
+import OtherThings.UsefulThings;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.nio.file.*;
 import java.util.regex.*;
@@ -10,7 +13,7 @@ import java.util.regex.*;
 public class FileParser {
     public static class SettingsParser {
         public enum Settings {
-            ARGUMENTS_FIELDS, PARAMETERS, CONFIGURATIONS,
+            FIELDS, PARAMETERS, CONFIGURATIONS,
             NOT_A_SETTINGS;
         }
         protected static boolean isSettingsUpload = false;
@@ -18,8 +21,8 @@ public class FileParser {
         protected static HashMap<String, Settings> settingsTable = new HashMap<>(){{
             this.put("param", Settings.PARAMETERS);
             this.put("config", Settings.CONFIGURATIONS);
-            this.put("fields", Settings.ARGUMENTS_FIELDS);
-            this.put("argument", Settings.ARGUMENTS_FIELDS);
+            this.put("field", Settings.FIELDS);
+            this.put("argument", Settings.FIELDS);
         }};
         protected static HashMap<Settings, LinkedList<String>> settingsAssociativeTable = new HashMap<>(){{
             for (var association : settingsTable.entrySet())
@@ -123,7 +126,34 @@ public class FileParser {
                         "Файл настроек не предназначен для считывания параметров" + PrettyOutput.RESET);
             return parametersTable;
         }
-        public void updateSettingsTable(String association, Settings settings)
+        public static HashMap<String, Object> getFieldsTable(
+                String pathToSettingsFile, Object object) throws IOException {
+            try {
+                setSettings(pathToSettingsFile);
+            } catch (RuntimeException exception) {
+                System.out.println(exception.getMessage());
+            }
+            HashMap<Settings, String> settingsPartTable = getSettingsPartTable(pathToSettingsFile);
+            HashMap<String, Object> fieldsTable = new HashMap<>();
+            List<Field> fields = Arrays.asList(object.getClass().getDeclaredFields());
+            if (settingsPartTable.containsKey(Settings.FIELDS))
+            {
+                String fieldsPart = settingsPartTable.get(Settings.FIELDS);
+                String[] fieldsFromFile = fieldsPart.split(";");
+                for (var fieldFromFile : fieldsFromFile)
+                {
+                    if (!fieldFromFile.isEmpty()) {
+                        String name = fieldFromFile.split("=")[0].strip();
+                        Object value = fieldFromFile.split("=")[1].strip();
+                        if (InputStreamParser.stringMatchesAnyItemOfList(
+                                UsefulThings.map(fields, Field::getName), name, "\\s+"))
+                            fieldsTable.put(name, value);
+                    }
+                }
+            }
+            return fieldsTable;
+        }
+        public static void updateSettingsTable(String association, Settings settings)
         {
             boolean exists = true;
             try {

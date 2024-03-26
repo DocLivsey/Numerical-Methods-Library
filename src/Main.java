@@ -1,18 +1,15 @@
 import java.io.*;
 import java.util.*;
-import java.nio.file.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import LinearAlgebra.*;
+import LinearAlgebra.Vector;
+import OtherThings.UsefulThings;
 import Parsers.FileParser;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         String pathToInputFile = "input.txt";
-        MathBase base = new MathBase();
-        base.updateVariablesList(List.of("step of method"));
-        System.out.println(base.getVariablesTable(pathToInputFile));
+        System.out.println(FileParser.SettingsParser.getFieldsTable(pathToInputFile, new MathFunctionOperations()));
     }
     public static void functionExamplesForMain() throws IOException {
         String pathToInputFile = "input.txt";

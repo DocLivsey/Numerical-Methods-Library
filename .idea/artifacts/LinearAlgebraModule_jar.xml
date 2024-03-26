@@ -2,7 +2,7 @@
   <artifact type="jar" name="LinearAlgebraModule:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/LinearAlgebraModule_jar</output-path>
     <root id="archive" name="LinearAlgebraModule.jar">
-      <element id="module-output" name="LinearAlgebraModule" />
+      <element id="module-output" name="NumericalMethodsLibrary" />
     </root>
   </artifact>
 </component>

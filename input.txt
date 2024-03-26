@@ -1,2 +1,2 @@
-# param
-step of method = 0.5;
+# fields
+math function = 37832.2;
