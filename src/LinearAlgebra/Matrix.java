@@ -5,7 +5,7 @@ import java.text.*;
 import java.util.*;
 import OtherThings.*;
 
-public class Matrix {
+public class Matrix extends NumericalBase {
     protected int rowsCount;
     protected int columnsCount;
     protected double[][] matrix;

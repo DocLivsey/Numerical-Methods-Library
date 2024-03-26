@@ -3,15 +3,14 @@ package LinearAlgebra;
 import java.io.*;
 import java.util.*;
 import OtherThings.*;
-public class MathFunctionOperations extends MathBase {
-    protected double epsilon = 1E-10;
+public class MathFunctionOperations extends NumericalBase {
     protected ArrayList<Double> arguments;
     protected ArrayList<Point2D> points;
     protected MathFunction mathFunction;
     public MathFunctionOperations(String pathToParametersFile, String pathToPoints, ArrayList<Point2D> points,
                                   ArrayList<Double> arguments, MathFunction mathFunction) throws IOException {
         if (pathToParametersFile != null)
-            this.setEpsilon(pathToParametersFile);
+            super.setEpsilon(pathToParametersFile);
         if (pathToPoints != null) {
             this.points = new ArrayList<>();
             this.readPointsFromFile(pathToPoints);
@@ -61,15 +60,11 @@ public class MathFunctionOperations extends MathBase {
     public MathFunctionOperations() throws IOException {
         this(null, null, null, null, null);
     }
-    public double getEpsilon() { return epsilon; }
     public ArrayList<Double> getArguments() { return arguments; }
     public ArrayList<Point2D> getPoints() { return this.points; }
     public MathFunction getMathFunction() { return mathFunction; }
     public double getArgument(int index) { return this.arguments.get(index); }
     public Point2D getPoint(int index) { return this.points.get(index); }
-    public void setEpsilon(String pathToParametersFile) throws IOException {
-        this.epsilon = getVariablesTable(pathToParametersFile).get("epsilon");
-    }
     public void setArguments(ArrayList<Double> arguments) { this.arguments = arguments; }
     public void setPoints(ArrayList<Point2D> points) { this.points = points; }
     public void setMathFunction(MathFunction mathFunction) { this.mathFunction = mathFunction; }
@@ -107,18 +102,18 @@ public class MathFunctionOperations extends MathBase {
     public Point2D calculatePoint(double x)
     {
         this.setArgument(0, x);
-        if (Math.abs(this.mathFunction.function(this.arguments).getY()) < epsilon)
+        if (Math.abs(this.mathFunction.function(this.arguments).getY()) < super.epsilon)
             return new Point2D(x, 0);
         if (Math.abs(this.mathFunction.function(this.arguments).getY()) == Double.POSITIVE_INFINITY
                 || Double.isNaN(this.mathFunction.function(this.arguments).getY()))
-            return  new Point2D(x, 1 / epsilon);
+            return  new Point2D(x, 1 / super.epsilon);
         return this.mathFunction.function(this.arguments);
     }
     public double differential(Point2D point)
     {
-        double dx = point.getX() + epsilon;
+        double dx = point.getX() + super.epsilon;
         double dy = this.calculatePoint(dx).getY() - point.getY();
-        return dy / epsilon;
+        return dy / super.epsilon;
     }
     public double calculateStep(double leftBorder, double rightBorder)
     { return (rightBorder - leftBorder) / 2; }

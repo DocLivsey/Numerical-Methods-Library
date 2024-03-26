@@ -5,7 +5,7 @@ import java.text.*;
 import java.util.*;
 import OtherThings.*;
 
-public class Vector {
+public class Vector extends NumericalBase {
     protected double[] vector;
     protected int vectorSize;
     public Vector(String pathToFile) throws FileNotFoundException
@@ -303,7 +303,7 @@ public class Vector {
     public boolean isZeroVector()
     {
         for (double item : this.vector)
-            if (item != 0 && Math.abs(item) > 1E-10)
+            if (item != 0 && Math.abs(item) > super.epsilon)
                 return false;
         return true;
     }

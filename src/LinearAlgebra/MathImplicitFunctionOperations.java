@@ -4,8 +4,7 @@ import OtherThings.PrettyOutput;
 
 import java.io.*;
 import java.util.*;
-public class MathImplicitFunctionOperations extends MathBase {
-    protected double epsilon = 1E-10;
+public class MathImplicitFunctionOperations extends NumericalBase {
     protected int dimension;
     protected ArrayList<PointMultiD> points;
     protected MathImplicitFunction function;
@@ -13,7 +12,7 @@ public class MathImplicitFunctionOperations extends MathBase {
                                           int dimension, MathImplicitFunction function) throws IOException {
         this.dimension = dimension;
         if (pathToParametersFile != null)
-            this.setEpsilon(pathToParametersFile);
+            super.setEpsilon(pathToParametersFile);
         if (pathToPoints != null) {
             this.points = new ArrayList<>();
             this.readPointsFromFile(pathToPoints);
@@ -64,15 +63,10 @@ public class MathImplicitFunctionOperations extends MathBase {
     public MathImplicitFunctionOperations() throws IOException {
         this(null);
     }
-    public double getEpsilon() { return epsilon; }
     public int getDimension() { return this.dimension; }
     public ArrayList<PointMultiD> getPoints() { return this.points; }
     public PointMultiD getPoint(int index) { return this.points.get(index); }
     public MathImplicitFunction getFunction() { return this.function; }
-
-    public void setEpsilon(String pathToParametersFile) throws IOException {
-        this.epsilon = super.getVariablesTable(pathToParametersFile).get("epsilon");
-    }
     public void setDimension(int dimension) { this.dimension = dimension; }
     public void setPoints(ArrayList<PointMultiD> points) { this.points = points; }
     public void setPoint(int index, PointMultiD point) { this.points.set(index, point); }
@@ -113,10 +107,10 @@ public class MathImplicitFunctionOperations extends MathBase {
             + this.toString() + PrettyOutput.RESET); }
     public PointMultiD calculatePoint(Vector x)
     {
-        if (Math.abs(this.function.function(x).getY()) < epsilon)
+        if (Math.abs(this.function.function(x).getY()) <= super.epsilon)
             return new PointMultiD(x, 0);
         if (Math.abs(this.function.function(x).getY()) == Double.POSITIVE_INFINITY)
-            return  new PointMultiD(x, 1 / epsilon);
+            return  new PointMultiD(x, 1 / super.epsilon);
         return function.function(x);
     }
     public void printPartialDifferential(int index)
@@ -129,13 +123,13 @@ public class MathImplicitFunctionOperations extends MathBase {
     public double partialDifferential(int variableIndex, PointMultiD point)
     {
         Vector dx = point.getVectorX().cloneVector();
-        dx.setItem(variableIndex, point.getX(variableIndex) + epsilon);
+        dx.setItem(variableIndex, point.getX(variableIndex) + super.epsilon);
         double dy;
         if (Double.isNaN(point.getY()))
             dy = this.calculatePoint(dx).getY() - this.calculatePoint(point.getVectorX()).getY();
         else
             dy = this.calculatePoint(dx).getY() - point.getY();
-        return dy / epsilon;
+        return dy / super.epsilon;
     }
     public double fullDifferential()
     { return 0; }

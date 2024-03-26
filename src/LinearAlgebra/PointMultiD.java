@@ -5,7 +5,7 @@ import OtherThings.PrettyOutput;
 import java.io.*;
 import java.util.*;
 
-public class PointMultiD {
+public class PointMultiD extends NumericalBase {
     protected Vector x;
     protected double y;
     public PointMultiD(String point, int pointDimension)

@@ -3,11 +3,8 @@ package LinearAlgebra;
 import OtherThings.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
 
-public class Point2D {
+public class Point2D extends NumericalBase {
     protected double x;
     protected double y;
     public Point2D()
@@ -31,7 +28,7 @@ public class Point2D {
     public static Point2D setXFromString(String xStr)
     {
         double x;
-        if (MathBase.isNumeric(xStr))
+        if (NumericalBase.isNumeric(xStr))
         {
             x = Double.parseDouble(xStr.trim());
             return new Point2D(x, Double.NaN);
@@ -41,7 +38,7 @@ public class Point2D {
     public static Point2D setPairFromString(String pair)
     {
         double x, y;
-        if (MathBase.severalNumeric(pair))
+        if (NumericalBase.severalNumeric(pair))
         {
             String[] splitPair = pair.trim().split("\\s+");
             x = Double.parseDouble(splitPair[0]);

@@ -6,8 +6,18 @@ import Parsers.*;
 import java.io.*;
 import java.util.*;
 
-public class MathBase {
-    protected final LinkedList<String> variablesList = new LinkedList<>(List.of("epsilon"));
+public class NumericalBase {
+    protected final TreeSet<String> variablesList = new TreeSet<>(List.of("epsilon"));
+    protected double epsilon;
+    public double getEpsilon() {
+        return epsilon;
+    }
+    public static double getEpsilon(double epsilon) {
+        return epsilon;
+    }
+    public void setEpsilon(String pathToSettingsFile) throws IOException {
+        this.epsilon = this.getVariablesTable(pathToSettingsFile).get("epsilon");
+    }
     public HashMap<String, Double> getVariablesTable(String pathToSettingsFile) throws IOException {
         HashMap<String, Double> variablesTable = new HashMap<>();
         HashMap<String, Double> parametersTable = FileParser.SettingsParser.getParametersTable(pathToSettingsFile);
