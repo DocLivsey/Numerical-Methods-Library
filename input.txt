@@ -1,2 +1,2 @@
 # fields
-math function = 37832.2;
+epsilon = 1E-10;

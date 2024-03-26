@@ -4,11 +4,13 @@ import OtherThings.*;
 import Parsers.*;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.*;
 
 public class NumericalBase {
-    protected final TreeSet<String> variablesList = new TreeSet<>(List.of("epsilon"));
+    protected final TreeSet<String> variablesList = new TreeSet<>();
     protected double epsilon;
+
     public double getEpsilon() {
         return epsilon;
     }
@@ -17,6 +19,19 @@ public class NumericalBase {
     }
     public void setEpsilon(String pathToSettingsFile) throws IOException {
         this.epsilon = this.getVariablesTable(pathToSettingsFile).get("epsilon");
+    }
+    public void setFields(String pathToSettingsFile) throws IOException, ReflectiveOperationException {
+        HashMap<String, Object> fields = FileParser.SettingsParser.getFieldsTable(pathToSettingsFile, this);
+        List<String> actualFields = (List<String>) UsefulThings.map(
+                Arrays.asList(this.getClass().getDeclaredFields()), Field::getName);
+        for (var field : fields.keySet())
+        {
+            if (InputStreamParser.stringMatchesAnyItemOfList(actualFields, field, "\\s+"))
+            {
+                Field actualField = this.getClass().getDeclaredField(field);
+                actualField.set(this, fields.get(field));
+            }
+        }
     }
     public HashMap<String, Double> getVariablesTable(String pathToSettingsFile) throws IOException {
         HashMap<String, Double> variablesTable = new HashMap<>();

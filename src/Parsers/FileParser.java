@@ -144,7 +144,7 @@ public class FileParser {
                 {
                     if (!fieldFromFile.isEmpty()) {
                         String name = fieldFromFile.split("=")[0].strip();
-                        Object value = fieldFromFile.split("=")[1].strip();
+                        Object value = Double.parseDouble(fieldFromFile.split("=")[1].strip());
                         if (InputStreamParser.stringMatchesAnyItemOfList(
                                 UsefulThings.map(fields, Field::getName), name, "\\s+"))
                             fieldsTable.put(name, value);

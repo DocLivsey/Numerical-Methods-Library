@@ -7,9 +7,11 @@ import OtherThings.UsefulThings;
 import Parsers.FileParser;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ReflectiveOperationException {
         String pathToInputFile = "input.txt";
-        System.out.println(FileParser.SettingsParser.getFieldsTable(pathToInputFile, new MathFunctionOperations()));
+        NumericalBase base = new NumericalBase();
+        base.setFields(pathToInputFile);
+        System.out.println(base.getEpsilon());
     }
     public static void functionExamplesForMain() throws IOException {
         String pathToInputFile = "input.txt";
