@@ -83,6 +83,10 @@ public class Vector extends NumericalBase {
             cloneVector.setItem(i, this.getItem(i));
         return cloneVector;
     }
+    @Override
+    public String toString() {
+        return Arrays.toString(this.vector);
+    }
     public static Vector createNewVector()
     {
         Vector vector = new Vector();
