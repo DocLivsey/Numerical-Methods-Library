@@ -6,12 +6,13 @@ import OtherThings.UsefulThings;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.nio.file.*;
 import java.util.regex.*;
 
 public class FileParser {
-    public static class SettingsParser {
+    public static class SettingsParser extends FileParser {
         public enum Settings {
             FIELDS, PARAMETERS, CONFIGURATIONS,
             NOT_A_SETTINGS;
@@ -167,5 +168,31 @@ public class FileParser {
                 throw new RuntimeException(PrettyOutput.ERROR + "There is no such value in enum: " +
                         PrettyOutput.COMMENT + settings + PrettyOutput.RESET);
         } // добавление по значению из Settings нового синонима в список синонимов
+        public File writeInSettingsFile(String pathToFolder, String fileName, HashMap<Settings, String> fileContentTable)
+                throws IOException {
+            File outputSettingsFile = new File(pathToFolder + "/" + fileName + ".txt");
+            FileWriter fileWriter = new FileWriter(outputSettingsFile);
+            if (outputSettingsFile.exists()) {
+                for (var setting : fileContentTable.keySet())
+                {
+                    String header = settingsAssociativeTable.get(setting).get(0);
+                    String body = fileContentTable.get(setting);
+                    fileWriter.write(header + "\n" + body + "\n");
+                }
+            } else {
+                if (outputSettingsFile.createNewFile()) {
+                    for (var setting : fileContentTable.keySet())
+                    {
+                        String header = settingsAssociativeTable.get(setting).get(0);
+                        String body = fileContentTable.get(setting);
+                        fileWriter.write(header + "\n" + body + "\n");
+                    }
+                } else
+                { throw new RuntimeException(PrettyOutput.ERROR + "Файл не создан по указанному пути: " +
+                        PrettyOutput.COMMENT + outputSettingsFile + PrettyOutput.RESET); }
+            }
+            fileWriter.close();
+            return outputSettingsFile;
+        }
     }
 }
