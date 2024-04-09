@@ -168,14 +168,17 @@ public class FileParser {
                 throw new RuntimeException(PrettyOutput.ERROR + "There is no such value in enum: " +
                         PrettyOutput.COMMENT + settings + PrettyOutput.RESET);
         } // добавление по значению из Settings нового синонима в список синонимов
-        public File writeInSettingsFile(String pathToFolder, String fileName, HashMap<Settings, String> fileContentTable)
-                throws IOException {
-            File outputSettingsFile = new File(pathToFolder + "/" + fileName + ".txt");
+        public static File writeInSettingsFile(String pathToFolder, String fileName,
+                                               HashMap<Settings, String> fileContentTable) throws IOException {
+            if (fileName.isEmpty())
+                fileName = "settings_file";
+            File outputSettingsFile = new File(pathToFolder.isEmpty() ? fileName + ".txt" :
+                    pathToFolder + "\\" + fileName + ".txt");
             FileWriter fileWriter = new FileWriter(outputSettingsFile);
             if (outputSettingsFile.exists()) {
                 for (var setting : fileContentTable.keySet())
                 {
-                    String header = settingsAssociativeTable.get(setting).get(0);
+                    String header = "#" + settingsAssociativeTable.get(setting).get(0);
                     String body = fileContentTable.get(setting);
                     fileWriter.write(header + "\n" + body + "\n");
                 }
@@ -183,7 +186,7 @@ public class FileParser {
                 if (outputSettingsFile.createNewFile()) {
                     for (var setting : fileContentTable.keySet())
                     {
-                        String header = settingsAssociativeTable.get(setting).get(0);
+                        String header = "#" + settingsAssociativeTable.get(setting).get(0);
                         String body = fileContentTable.get(setting);
                         fileWriter.write(header + "\n" + body + "\n");
                     }
