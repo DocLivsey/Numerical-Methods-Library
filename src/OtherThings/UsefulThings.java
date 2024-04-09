@@ -1,5 +1,6 @@
 package OtherThings;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class UsefulThings {
@@ -9,5 +10,18 @@ public class UsefulThings {
         for (var item : iterable)
             collection.add(procedure.apply(item));
         return collection;
+    }
+    public static<T, F> T convertInstanceOfObject(F f) {
+        try {
+            return (T) f;
+        } catch(ClassCastException e) {
+            return null;
+        }
+    }
+    public static<T> Collection<T> convertArrayToCollection(T[] array) {
+        return Arrays.asList(array);
+    }
+    public static<T> T[] convertCollectionToArray(Collection<T> collection) {
+        return (T[]) collection.stream().toArray();
     }
 }
