@@ -1,5 +1,8 @@
-package LinearAlgebra;
+package MathModule;
 
+import MathModule.LinearAlgebra.PointMultiD;
+import MathModule.LinearAlgebra.PointNormComparator;
+import MathModule.LinearAlgebra.Vector;
 import OtherThings.PrettyOutput;
 
 import java.io.*;
@@ -9,58 +12,58 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     protected ArrayList<PointMultiD> points;
     protected MathImplicitFunction function;
     public MathImplicitFunctionOperations(String pathToParametersFile, String pathToPoints, ArrayList<PointMultiD> points,
-                                          int dimension, MathImplicitFunction function) throws IOException {
+                                          int dimension, MathImplicitFunction function) throws Exception {
         this.dimension = dimension;
-        if (pathToParametersFile != null)
-            super.setEpsilon(pathToParametersFile);
-        if (pathToPoints != null) {
+        if (pathToParametersFile != null) {
+            super.setFields(pathToParametersFile);
+            this.setFields(pathToParametersFile);
+        } if (pathToPoints != null) {
             this.points = new ArrayList<>();
             this.readPointsFromFile(pathToPoints);
         } else this.points = Objects.requireNonNullElseGet(points, ArrayList::new);
         if (function != null) {
             this.function = function;
-            if (!this.points.isEmpty()) {
-                for (int i = 0; i < this.points.size(); i++) {
-                    Vector x = this.getPoint(i).getVectorX();
-                    this.setPoint(i, this.calculatePoint(x));
-                }
+            for (int i = 0; i < this.points.size(); i++)
+            {
+                if (Double.isNaN(this.getPoint(i).getY()))
+                    this.setPoint(i, this.calculatePoint(this.getPoint(i).getVectorX()));
             }
-        } else this.function = (x) -> new PointMultiD(new Vector(this.dimension), Double.NaN);
+        } else this.function = (x) -> new PointMultiD(new MathModule.LinearAlgebra.Vector(this.dimension), Double.NaN);
     }
     public MathImplicitFunctionOperations(String pathToParametersFile, String pathToPoints, int dimension,
-                                          MathImplicitFunction function) throws IOException {
+                                          MathImplicitFunction function) throws Exception {
         this(pathToParametersFile, pathToPoints, null, dimension, function);
     }
     public MathImplicitFunctionOperations(String pathToPoints, int dimension,
-                                          MathImplicitFunction function) throws IOException {
+                                          MathImplicitFunction function) throws Exception {
         this(null, pathToPoints, dimension, function);
     }
     public MathImplicitFunctionOperations(String pathToParametersFile, ArrayList<PointMultiD> points, int dimension,
-                                          MathImplicitFunction function) throws IOException {
+                                          MathImplicitFunction function) throws Exception {
         this(pathToParametersFile, null, points, dimension, function);
     }
     public MathImplicitFunctionOperations(ArrayList<PointMultiD> points, int dimension,
-                                          MathImplicitFunction function) throws IOException {
+                                          MathImplicitFunction function) throws Exception {
         this(null, points, dimension, function);
     }
     public  MathImplicitFunctionOperations(String pathToParametersFile, String pathToPoints,
-                                           int dimension) throws IOException {
+                                           int dimension) throws Exception {
         this(pathToParametersFile, pathToPoints, null, dimension, null);
     }
-    public  MathImplicitFunctionOperations(String pathToPoints, int dimension) throws IOException {
+    public  MathImplicitFunctionOperations(String pathToPoints, int dimension) throws Exception {
         this(null, pathToPoints, dimension);
     }
     public MathImplicitFunctionOperations(String pathToParametersFile, int dimension,
-                                          ArrayList<PointMultiD> points) throws IOException {
+                                          ArrayList<PointMultiD> points) throws Exception {
         this(pathToParametersFile, null, points, dimension, null);
     }
-    public MathImplicitFunctionOperations(ArrayList<PointMultiD> points, int dimension) throws IOException {
+    public MathImplicitFunctionOperations(ArrayList<PointMultiD> points, int dimension) throws Exception {
         this(null, dimension, points);
     }
-    public MathImplicitFunctionOperations(String pathToParametersFile) throws IOException {
+    public MathImplicitFunctionOperations(String pathToParametersFile) throws Exception {
         this(pathToParametersFile, null, 1);
     }
-    public MathImplicitFunctionOperations() throws IOException {
+    public MathImplicitFunctionOperations() throws Exception {
         this(null);
     }
     public int getDimension() { return this.dimension; }
@@ -105,7 +108,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     public void printFunction()
     { System.out.println(PrettyOutput.HEADER_OUTPUT + "Функция\n" + PrettyOutput.OUTPUT
             + this.toString() + PrettyOutput.RESET); }
-    public PointMultiD calculatePoint(Vector x)
+    public PointMultiD calculatePoint(MathModule.LinearAlgebra.Vector x)
     {
         if (Math.abs(this.function.function(x).getY()) <= super.epsilon)
             return new PointMultiD(x, 0);

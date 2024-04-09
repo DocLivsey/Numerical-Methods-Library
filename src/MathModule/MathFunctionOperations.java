@@ -1,7 +1,9 @@
-package LinearAlgebra;
+package MathModule;
 
 import java.io.*;
 import java.util.*;
+
+import MathModule.LinearAlgebra.Point2D;
 import OtherThings.*;
 public class MathFunctionOperations extends NumericalBase {
     protected ArrayList<Double> arguments;
@@ -12,20 +14,17 @@ public class MathFunctionOperations extends NumericalBase {
         if (pathToParametersFile != null)
             super.setEpsilon(pathToParametersFile);
         if (pathToPoints != null) {
-            this.points = new ArrayList<>();
+            this.points = Objects.requireNonNullElseGet(points, ArrayList::new);
             this.readPointsFromFile(pathToPoints);
         } else this.points = Objects.requireNonNullElseGet(points, ArrayList::new);
+        this.arguments = Objects.requireNonNullElseGet(arguments, ArrayList::new);
         if (mathFunction != null)
         {
-            if (arguments != null)
-                this.arguments = arguments;
             this.mathFunction = mathFunction;
             this.expandPointsArea();
             if (this.isAnyNullValuesInPoints())
                 this.calculateNullValues();
         } else if (this.points.isEmpty()) {
-            if (arguments != null)
-                this.arguments = arguments;
             this.mathFunction = x -> new Point2D(Double.NaN, Double.NaN);
         }
     }
@@ -75,11 +74,19 @@ public class MathFunctionOperations extends NumericalBase {
     {
         for (Point2D point : points)
             this.addPoint(point);
+        this.points = new ArrayList<>(new HashSet<>(this.points));
         this.sortPoints();
     }
     @Override
-    public boolean equals(Object obj)
-    { return super.equals(obj); }
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        MathFunctionOperations functionOperations = (MathFunctionOperations) obj;
+        return this.getPoints().equals(functionOperations.getPoints()) &&
+                this.getArguments().equals(functionOperations.getArguments());
+    }
     public MathFunctionOperations cloneMathFunction() throws IOException {
         return new MathFunctionOperations(this.points, this.arguments, this.mathFunction);
     }

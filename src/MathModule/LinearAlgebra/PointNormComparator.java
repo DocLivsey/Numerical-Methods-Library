@@ -1,4 +1,4 @@
-package LinearAlgebra;
+package MathModule.LinearAlgebra;
 
 import OtherThings.*;
 
