@@ -1,8 +1,12 @@
-package LinearAlgebra;
+package MathModule.LinearAlgebra;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.DoubleStream;
+
+import MathModule.NumericalBase;
 import OtherThings.*;
 
 public class Vector extends NumericalBase {
@@ -76,7 +80,7 @@ public class Vector extends NumericalBase {
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-    Vector cloneVector()
+    public Vector cloneVector()
     {
         Vector cloneVector = new Vector(this.vectorSize);
         for (int i = 0; i < this.vectorSize; i++)
@@ -310,5 +314,20 @@ public class Vector extends NumericalBase {
             if (item != 0 && Math.abs(item) > super.epsilon)
                 return false;
         return true;
+    }
+    public boolean isNanVector()
+    {
+        AtomicBoolean flag = new AtomicBoolean(false); // because flag uses in lambda expression
+        Arrays.stream(this.vector).forEach(item -> {
+            if (Double.isNaN(item))
+                flag.set(true);
+        });
+        return flag.get();
+    }
+    public List<Double> convertToList() {
+        return DoubleStream.of(this.vector).boxed().toList();
+    }
+    public Vector convertListToVector(List<Double> list) {
+        return new Vector(list.stream().mapToDouble(Double::doubleValue).toArray(), list.size());
     }
 }

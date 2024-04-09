@@ -1,7 +1,8 @@
 package Parsers;
 
 import java.util.*;
-import LinearAlgebra.*;
+import MathModule.*;
+import MathModule.LinearAlgebra.Point2D;
 import OtherThings.*;
 
 

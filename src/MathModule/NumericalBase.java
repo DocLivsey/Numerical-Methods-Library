@@ -1,4 +1,4 @@
-package LinearAlgebra;
+package MathModule;
 
 import OtherThings.*;
 import Parsers.*;
@@ -8,14 +8,23 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class NumericalBase {
-    protected final TreeSet<String> variablesList = new TreeSet<>();
-    protected double epsilon;
-
+    protected final TreeSet<String> variablesList = new TreeSet<>(List.of("epsilon"));
+    protected final HashMap<String, Double> parametersTable = new HashMap<>();
+    protected double epsilon = 1E-10;
+    public TreeSet<String> getVariablesList() {
+        return variablesList;
+    }
+    public HashMap<String, Double> getParametersTable() {
+        return parametersTable;
+    }
     public double getEpsilon() {
         return epsilon;
     }
     public static double getEpsilon(double epsilon) {
         return epsilon;
+    }
+    public void setParametersTable(String pathToParametersFile) throws IOException {
+        this.parametersTable.putAll(getVariablesTable(pathToParametersFile));
     }
     public void setEpsilon(String pathToSettingsFile) throws IOException {
         this.epsilon = this.getVariablesTable(pathToSettingsFile).get("epsilon");
@@ -41,6 +50,18 @@ public class NumericalBase {
             if (InputStreamParser.stringMatchesAnyItemOfList(this.variablesList, parameter, replaceRegex))
                 variablesTable.put(parameter.replaceAll(replaceRegex, ""), parametersTable.get(parameter));
         return variablesTable;
+    }
+    public boolean isParameterOfMethodUpload(Collection<String> parameters)
+    {
+        for (String parameter : parameters)
+        {
+            if (!this.parametersTable.containsKey(parameter))
+                return false;
+            else
+            if (this.parametersTable.get(parameter) == null)
+                return false;
+        }
+        return true;
     }
     @Override
     public boolean equals(Object obj)

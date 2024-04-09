@@ -1,5 +1,6 @@
-package LinearAlgebra;
+package MathModule.LinearAlgebra;
 
+import MathModule.NumericalBase;
 import OtherThings.*;
 
 import java.io.*;
@@ -18,13 +19,21 @@ public class Point2D extends NumericalBase {
     public void setY(double y)
     { this.y = y; }
     @Override
-    public String toString()
-    { return this.getX() + ";" + this.getY(); }
+    public String toString() { return this.getX() + ";" + this.getY(); }
     @Override
-    public boolean equals(Object obj)
-    { return super.equals(obj); }
-    public Point2D clonePoint()
-    { return new Point2D(this.getX(), this.getY()); }
+    public int hashCode() {
+        return (int) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Point2D point2D = (Point2D) obj;
+        return point2D.getY() == this.getY() && point2D.getX() == this.getX();
+    }
+    public Point2D copy() { return new Point2D(this.getX(), this.getY()); }
     public static Point2D setXFromString(String xStr)
     {
         double x;
@@ -52,7 +61,7 @@ public class Point2D extends NumericalBase {
         String pair = reader.readLine();
         return Point2D.setPairFromString(pair);
     }
-    public boolean isNullPoint()
+    public boolean isNanPoint()
     { return Double.isNaN(this.getX()) || Double.isNaN(this.getY()); }
     public void print()
     { System.out.println(PrettyOutput.OUTPUT + "(" + this + ")" + PrettyOutput.RESET); }

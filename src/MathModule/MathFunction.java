@@ -1,4 +1,6 @@
-package LinearAlgebra;
+package MathModule;
+
+import MathModule.LinearAlgebra.Point2D;
 
 import java.util.*;
 @FunctionalInterface

@@ -1,20 +1,18 @@
-package LinearAlgebra;
+package MathModule.LinearAlgebra;
 
+import MathModule.NumericalBase;
 import OtherThings.PrettyOutput;
-
-import java.io.*;
-import java.util.*;
 
 public class PointMultiD extends NumericalBase {
     protected Vector x;
     protected double y;
+    public PointMultiD(Vector x, double y)
+    { this.x = x; this.y = y; }
     public PointMultiD(String point, int pointDimension)
     {
         this.x = new Vector(pointDimension - 1);
         this.setPointFromString(point, pointDimension);
     }
-    public PointMultiD(Vector x, double y)
-    { this.x = x; this.y = y; }
     public PointMultiD()
     {
         this.x = new Vector();
@@ -34,7 +32,7 @@ public class PointMultiD extends NumericalBase {
     { this.y = y; }
     @Override
     public String toString()
-    { return super.toString(); }
+    { return this.x + ";" + this.y; }
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
@@ -66,9 +64,8 @@ public class PointMultiD extends NumericalBase {
     }
     public void print()
     {
-        System.out.print("{[ ");
-        for (int i = 0; i < this.x.getVectorSize(); i++)
-            System.out.print(this.getX(i) + "; ");
-        System.out.println("] " + this.y + "}");
+        System.out.println(PrettyOutput.HEADER_OUTPUT + "Точка размерностью: " +
+                (this.getVectorX().getVectorSize() + 1) + PrettyOutput.RESET);
+        System.out.println("(" + this + ")");
     }
 }

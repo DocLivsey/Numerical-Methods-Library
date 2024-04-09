@@ -1,8 +1,10 @@
-package LinearAlgebra;
+package MathModule.LinearAlgebra;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
+
+import MathModule.NumericalBase;
 import OtherThings.*;
 
 public class Matrix extends NumericalBase {
