@@ -1,8 +1,6 @@
 package Parsers;
 
-import OtherThings.PrettyOutput;
-import OtherThings.Procedure;
-import OtherThings.UsefulThings;
+import OtherThings.*;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -12,6 +10,15 @@ import java.nio.file.*;
 import java.util.regex.*;
 
 public class FileParser {
+    public static<T, C extends Collection<T>> C readDataFromFile(
+            String pathToFile, Procedure<C, List<String>> how) throws IOException {
+        Scanner fileScanner = new Scanner(new File(pathToFile));
+        List<String> linesList = new LinkedList<>();
+        while (fileScanner.hasNext())
+            linesList.add(fileScanner.nextLine());
+        return how.apply(linesList);
+    }
+
     public static class SettingsParser extends FileParser {
         public enum Settings {
             FIELDS, PARAMETERS, CONFIGURATIONS,
