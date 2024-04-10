@@ -21,17 +21,36 @@ public abstract class Vector<T> extends NumericalBase {
         this.vectorSize = vectorSize;
     }
 
-    public Vector<T> add(Vector<T> addVector) {
-        return null;
+    public T getElementAt(int index) {
+        return vector.get(index);
     }
-    public Vector<T> subtraction(Vector<T> subVector) {
-        return null;
+    public void setElementAt(T element, int index) {
+        vector.set(index, element);
     }
-    public Vector<T> multiply(Vector<T> multiplyVector) {
-        return null;
+    public void addElementAt(T element, int index) {
+        LinkedList<T> list = new LinkedList<>(this.vector);
+        list.add(index, element);
+        this.vector = new ArrayList<>(list);
     }
-    public Vector<T> div(Vector<T> divVector) {
-        return null;
+    public void addElement(T element) {
+        LinkedList<T> list = new LinkedList<>(this.vector);
+        list.add(element);
+        this.vector = new ArrayList<>(list);
     }
+    public void removeElementAt(int index) {
+        LinkedList<T> list = new LinkedList<>(this.vector);
+        list.remove(index);
+        this.vector = new ArrayList<>(list);
+    }
+    public void removeElement(T element) {
+        LinkedList<T> list = new LinkedList<>(this.vector);
+        list.remove(element);
+        this.vector = new ArrayList<>(list);
+    }
+
+    public abstract Vector<T> add(Vector<T> addVector) throws ReflectiveOperationException, IOException;
+    public abstract Vector<T> subtraction(Vector<T> subVector) throws ReflectiveOperationException, IOException;
+    public abstract Vector<T> scalarMultiply(Vector<T> multiplyVector);
+    public abstract Vector<T> vectorMultiply(Vector<T> multiplyVector);
 
 }
