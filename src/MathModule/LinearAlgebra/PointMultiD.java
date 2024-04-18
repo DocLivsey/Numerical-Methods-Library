@@ -1,33 +1,34 @@
 package MathModule.LinearAlgebra;
 
 import MathModule.NumericalBase;
+import MathModule.Vector;
 import OtherThings.PrettyOutput;
 
+import java.io.IOException;
+
 public class PointMultiD extends NumericalBase {
-    protected Vector x;
+    protected MathModule.Vector x;
     protected double y;
-    public PointMultiD(Vector x, double y)
+    public PointMultiD(MathModule.Vector x, double y)
     { this.x = x; this.y = y; }
-    public PointMultiD(String point, int pointDimension)
-    {
-        this.x = new Vector(pointDimension - 1);
+    public PointMultiD(String point, int pointDimension) throws ReflectiveOperationException, IOException {
+        this.x = new MathModule.Vector();
         this.setPointFromString(point, pointDimension);
     }
-    public PointMultiD()
-    {
+    public PointMultiD() throws ReflectiveOperationException, IOException {
         this.x = new Vector();
         this.y = Double.NaN;
     }
-    public Vector getVectorX()
+    public MathModule.Vector getVectorX()
     { return x; }
     public double getX(int index)
     { return x.getItem(index); }
     public double getY()
     { return y; }
-    public void setVectorX(Vector x)
+    public void setVectorX(MathModule.Vector x)
     { this.x = x; }
     public void setX(int index, double x)
-    { this.x.setItem(index, x); }
+    { this.x.setElementAt(x, index); }
     public void setY(double y)
     { this.y = y; }
     @Override
@@ -36,8 +37,7 @@ public class PointMultiD extends NumericalBase {
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
-    public PointMultiD clonePoint()
-    {
+    public PointMultiD clonePoint() throws ReflectiveOperationException, IOException {
         PointMultiD clonePoint = new PointMultiD();
         clonePoint.setVectorX(this.getVectorX());
         clonePoint.setY(this.getY());

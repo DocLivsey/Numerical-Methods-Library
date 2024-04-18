@@ -2,7 +2,6 @@ package MathModule;
 
 import MathModule.LinearAlgebra.PointMultiD;
 import MathModule.LinearAlgebra.PointNormComparator;
-import MathModule.LinearAlgebra.Vector;
 import OtherThings.PrettyOutput;
 
 import java.io.*;
@@ -28,7 +27,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
                 if (Double.isNaN(this.getPoint(i).getY()))
                     this.setPoint(i, this.calculatePoint(this.getPoint(i).getVectorX()));
             }
-        } else this.function = (x) -> new PointMultiD(new MathModule.LinearAlgebra.Vector(this.dimension), Double.NaN);
+        } else this.function = (x) -> new PointMultiD(new Vector(), Double.NaN);
     }
     public MathImplicitFunctionOperations(String pathToParametersFile, String pathToPoints, int dimension,
                                           MathImplicitFunction function) throws Exception {
@@ -88,8 +87,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     @Override
     protected MathImplicitFunctionOperations clone() throws CloneNotSupportedException
     { return (MathImplicitFunctionOperations) super.clone(); }
-    public void readPointsFromFile(String pathToFile) throws FileNotFoundException
-    {
+    public void readPointsFromFile(String pathToFile) throws IOException, ReflectiveOperationException {
         File input = new File(pathToFile);
         Scanner fileScan = new Scanner(input);
         while (fileScan.hasNextLine())
@@ -108,25 +106,23 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     public void printFunction()
     { System.out.println(PrettyOutput.HEADER_OUTPUT + "Функция\n" + PrettyOutput.OUTPUT
             + this.toString() + PrettyOutput.RESET); }
-    public PointMultiD calculatePoint(MathModule.LinearAlgebra.Vector x)
-    {
+    public PointMultiD calculatePoint(MathModule.Vector x) throws ReflectiveOperationException, IOException {
         if (Math.abs(this.function.function(x).getY()) <= super.epsilon)
             return new PointMultiD(x, 0);
         if (Math.abs(this.function.function(x).getY()) == Double.POSITIVE_INFINITY)
             return  new PointMultiD(x, 1 / super.epsilon);
         return function.function(x);
     }
-    public void printPartialDifferential(int index)
-    {
+    public void printPartialDifferential(int index) throws ReflectiveOperationException, IOException {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Частная Производная Функции по переменной x"
                 + index + " в каждой точке:" + PrettyOutput.RESET);
         for (PointMultiD point : this.points)
             new PointMultiD(point.getVectorX(), this.partialDifferential(index, point)).print();
     }
     public double partialDifferential(int variableIndex, PointMultiD point)
-    {
-        Vector dx = point.getVectorX().cloneVector();
-        dx.setItem(variableIndex, point.getX(variableIndex) + super.epsilon);
+            throws ReflectiveOperationException, IOException {
+        MathModule.Vector dx = point.getVectorX().copy();
+        dx.setElementAt(point.getX(variableIndex) + super.epsilon, variableIndex);
         double dy;
         if (Double.isNaN(point.getY()))
             dy = this.calculatePoint(dx).getY() - this.calculatePoint(point.getVectorX()).getY();
