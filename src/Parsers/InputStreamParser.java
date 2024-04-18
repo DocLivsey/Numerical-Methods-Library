@@ -1,5 +1,7 @@
 package Parsers;
 
+import OtherThings.Pair;
+
 import java.util.*;
 import java.lang.*;
 import java.util.regex.Matcher;
@@ -87,6 +89,28 @@ public class InputStreamParser {
                 inString.add(item);
         }
         return inString;
+    }
+    public static<T> Pair<Boolean, T> isClassInList(List<Object> inputList, Class<T> tClass) {
+        for (var item : inputList) {
+            if (item.getClass() == tClass)
+                return new Pair<>(true, (T) item);
+        }
+        return new Pair<>(false, null);
+    }
+    public static<T> Pair<Boolean, List<T>> isClassesInList(List<Object> inputList, Class<T> tClass) {
+        List<T> list = new ArrayList<>();
+        for (var item : inputList)
+            if (item.getClass() == tClass)
+                list.add((T) item);
+        return new Pair<>(!list.isEmpty(), list);
+    }
+    public static<T> boolean isClassesInListAtOnce(List<Object> inputList, Class<T> tClass) {
+        Pair<Boolean, List<T>> pair = isClassesInList(inputList, tClass);
+        return pair.getFirst() && (pair.getSecond().size() <= 1);
+    }
+    public static<T> boolean isOnlyGivenClassesInList(List<Object> inputList, Class<T> tClass) {
+        Pair<Boolean, List<T>> pair = isClassesInList(inputList, tClass);
+        return pair.getFirst() && pair.getSecond().size() == inputList.size();
     }
     public static <T, F> T parseGeneric(F from)
     {
