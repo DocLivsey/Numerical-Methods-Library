@@ -1,12 +1,17 @@
 package MathModule;
 
+import MathModule.LinearAlgebra.Matrix;
+import MathModule.LinearAlgebra.PointMultiD;
 import OtherThings.PrettyOutput;
-import OtherThings.Procedure;
 import OtherThings.UsefulThings;
 import Parsers.FileParser;
+import Parsers.InputStreamParser;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 //import daler_monkey
 
 public class Vector extends MathModule.Abstract.Vector<Double> {
@@ -37,44 +42,178 @@ public class Vector extends MathModule.Abstract.Vector<Double> {
     public Vector() throws IOException, ReflectiveOperationException {
         this((String) null);
     }
-    public void setVectorFromFile(String pathToFile) throws IOException {
-        this.vector = (ArrayList<Double>) FileParser.readDataFromFile(pathToFile, (Procedure<List<Double>, List<String>>)
-                from -> new ArrayList<>(UsefulThings.map(from, Double::parseDouble)));
+    public static Vector createZeroVector(int vectorSize) throws ReflectiveOperationException, IOException {
+        ArrayList<Double> vector = new ArrayList<>(Collections.nCopies(vectorSize, 0.0));
+        return new Vector(vector);
+    }
+    public Vector copy() throws ReflectiveOperationException, IOException {
+        return new Vector(this.vector);
     }
     @Override
-    public MathModule.Abstract.Vector<Double> add(MathModule.Abstract.Vector<Double> addVector)
+    public int hashCode() {
+        return (int) ChebyshevNorm();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return this.vector.equals(((Vector) obj).vector);
+    }
+    @Override
+    public String toString() {
+        return this.toString("");
+    }
+    public String toString(String outputFormatPattern) {
+        StringBuilder toString = new StringBuilder();
+        if (outputFormatPattern == null || outputFormatPattern.equals("\\s+") || outputFormatPattern.isEmpty()) {
+            for (var element : this.vector)
+                toString.append(element).append(" ");
+            return toString.toString();
+        }
+        DecimalFormat outputFormat = new DecimalFormat(outputFormatPattern);
+        for (var element : this.vector)
+            toString.append(outputFormat.format(element)).append(" ");
+        return toString.toString();
+    }
+    public void setVectorFromFile(String pathToFile) throws IOException {
+        this.vector = new ArrayList<>();
+        List<List<Double>> inputVector = FileParser.readDataFromFile(pathToFile,
+                from -> {
+                    List<List<Double>> vectorsList = new ArrayList<>();
+                    for (var line : from) {
+                        List<String> linesElements = Arrays.asList(line.strip().split("\\s+"));
+                        vectorsList.add((List<Double>) UsefulThings.map(linesElements, Double::parseDouble));
+                    }
+                    return vectorsList;
+                });
+        if (inputVector.size() > 1) {
+            for (List<Double> vector : inputVector) {
+                if (vector.size() > 1)
+                    throw new RuntimeException(PrettyOutput.ERROR + "Невозможно считать вектор с файла\n" +
+                            "Размерность входных данных не соответсвует вектору\n" +
+                            "Веорятно в файле записан не вектор" + PrettyOutput.RESET);
+            }
+            inputVector.forEach(vector -> this.vector.add(vector.get(0)));
+        } else {
+            this.vector.addAll(inputVector.get(0));
+        }
+    }
+    public void writeVectorInFile(String pathToFile, String outputFormatPattern) throws IOException {
+        FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
+    }
+    public void writeVectorInDesiredFolder(String pathToFolder, String fileName, String outputFormatPattern)
+            throws IOException {
+        Pattern pattern = Pattern.compile("\\w+\\.txt$");
+        String pathToFile;
+        if (pattern.matcher(pathToFolder).matches())
+            pathToFile = pathToFolder + fileName;
+        else
+            pathToFile = pathToFolder + fileName + ".txt";
+        FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
+    }
+    public void validateAbstractMethodsInput(ArrayList<Object> args) {
+        if (!InputStreamParser.isClassesInListAtOnce(args, Vector.class)) {
+            throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
+        } else {
+            Vector vector = (Vector) args.get(0);
+            if (vector.getVectorSize() != this.vector.size())
+                throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
+                        "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
+        }
+    }
+    @Override
+    public MathModule.Abstract.Vector<? extends Number> add(ArrayList<Object> args)
             throws ReflectiveOperationException, IOException {
-        if (this.vectorSize != addVector.getVectorSize())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
-                    "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
+        validateAbstractMethodsInput(args);
         Vector sumVector = new Vector();
+        Vector addVector = (Vector) args.get(0);
         for (int i = 0; i < this.vectorSize; i++)
             sumVector.setElementAt(this.getElementAt(i) + addVector.getElementAt(i), i);
         return sumVector;
     }
     @Override
-    public MathModule.Abstract.Vector<Double> subtraction(MathModule.Abstract.Vector<Double> subVector)
+    public MathModule.Abstract.Vector<? extends Number> subtraction(ArrayList<Object> args)
             throws ReflectiveOperationException, IOException {
-        if (this.vectorSize != subVector.getVectorSize())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
-                    "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
+        validateAbstractMethodsInput(args);
         Vector differenceVector = new Vector();
+        Vector subVector = (Vector) args.get(0);
         for (int i = 0; i < this.vectorSize; i++)
             differenceVector.setElementAt(this.getElementAt(i) - subVector.getElementAt(i), i);
         return differenceVector;
     }
     @Override
-    public MathModule.Abstract.Vector<Double> scalarMultiply(MathModule.Abstract.Vector<Double> multiplyVector) {
-        if (this.vectorSize != multiplyVector.getVectorSize())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
-                    "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
-        return null;
+    public double scalarMultiply(ArrayList<Object> args) {
+        validateAbstractMethodsInput(args);
+        double result = 0;
+        Vector multiplyVector = (Vector) args.get(0);
+        for (int i = 0; i < this.vectorSize; i++)
+            result += this.getElementAt(i) + multiplyVector.getElementAt(i);
+        return result;
     }
     @Override
-    public MathModule.Abstract.Vector<Double> vectorMultiply(MathModule.Abstract.Vector<Double> multiplyVector) {
-        if (this.vectorSize != multiplyVector.getVectorSize())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
-                    "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
-        return null;
+    public MathModule.Abstract.Vector<? extends Number> constMultiply(ArrayList<Object> args)
+            throws ReflectiveOperationException, IOException {
+        if (!InputStreamParser.isClassesInListAtOnce(args, Number.class))
+            throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
+        Double constant = (Double) args.get(0);
+        Vector resultVector = new Vector();
+        this.vector.forEach(element -> resultVector.getVector().add(element * constant)) ;
+        return resultVector;
+    }
+    public double ChebyshevNorm() {
+        double result = 0;
+        for (double element : this.vector)
+            result = Math.max(Math.abs(element), Math.abs(result));
+        return result;
+    }
+    /*
+     *  ИНЫМИ СЛОВАМИ ТРАНСПОНИРОВАНИЕ
+     */
+    public Matrix toMatrix() {
+        double[][] convertMatrix = new double[this.vectorSize][1];
+        for (int i = 0; i < this.vectorSize; i++)
+            convertMatrix[i][0] = this.getElementAt(i);
+        return new Matrix(convertMatrix, this.vectorSize, 1);
+    }
+    public Vector partOfVector(int leftBorder, int rightBorder) throws IOException, ReflectiveOperationException {
+        ArrayList<Double> vectorPart = new ArrayList<>();
+        for (int oldIndex = leftBorder, newIndex = 0; oldIndex < rightBorder + 1; oldIndex++, newIndex++)
+            vectorPart.set(newIndex, this.getElementAt(oldIndex));
+        return new Vector(vectorPart);
+    }
+    public void sort() {
+        this.vector.sort(Double::compareTo);
+    }
+    public static Vector sorted(Vector vector) {
+        vector.sort();
+        return vector;
+    }
+    public boolean isEmpty() {
+        return this.vector.isEmpty();
+    }
+    public boolean isZeroVector () {
+        AtomicBoolean flag = new AtomicBoolean(false);
+        this.vector.forEach(element -> {
+            if (element != 0 || Math.abs(element) > super.getEpsilon())
+                flag.set(true);
+        });
+        return flag.get();
+    }
+    public boolean isNanVector () {
+        AtomicBoolean flag = new AtomicBoolean(false); // because flag uses in lambda expression
+        Arrays.stream(this.vector.toArray()).forEach(item -> {
+            if (Double.isNaN((Double) item))
+                flag.set(true);
+        });
+        return flag.get();
+    }
+    public boolean isInVector(double element) {
+        return this.vector.contains(element);
     }
 }
