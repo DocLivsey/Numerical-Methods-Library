@@ -22,7 +22,7 @@ public class PointMultiD extends NumericalBase {
     public MathModule.Vector getVectorX()
     { return x; }
     public double getX(int index)
-    { return x.getItem(index); }
+    { return x.getElementAt(index); }
     public double getY()
     { return y; }
     public void setVectorX(MathModule.Vector x)
@@ -37,7 +37,7 @@ public class PointMultiD extends NumericalBase {
     @Override
     public boolean equals(Object obj)
     { return super.equals(obj); }
-    public PointMultiD clonePoint() throws ReflectiveOperationException, IOException {
+    public PointMultiD copy() throws ReflectiveOperationException, IOException {
         PointMultiD clonePoint = new PointMultiD();
         clonePoint.setVectorX(this.getVectorX());
         clonePoint.setY(this.getY());
