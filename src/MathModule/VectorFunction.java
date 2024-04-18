@@ -1,7 +1,7 @@
 package MathModule;
 
 import MathModule.Abstract.Vector;
-import MathModule.LinearAlgebra.PointMultiD;
+import MathModule.LinearAlgebra.*;
 import OtherThings.PrettyOutput;
 import Parsers.InputStreamParser;
 
@@ -30,7 +30,7 @@ public class VectorFunction extends Vector<MathImplicitFunctionOperations> {
                 !InputStreamParser.isClassesInListAtOnce(args, PointMultiD.class))
             throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
                     "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT +
-                    "MathModule.Vector<MathImplicitFunction>" + PrettyOutput.CHOOSE + " Описание: "
+                    "MathModule.LinearAlgebra.Vector<MathImplicitFunction>" + PrettyOutput.CHOOSE + " Описание: "
                     + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.CHOOSE + "class: " +
                     PrettyOutput.COMMENT + "MathModule.LinearAlgebra.PointMultiD" + PrettyOutput.CHOOSE + " Описание: "
                     + PrettyOutput.COMMENT + "точка в которой суммируем вектора" + PrettyOutput.RESET);
@@ -51,7 +51,7 @@ public class VectorFunction extends Vector<MathImplicitFunctionOperations> {
             else if (arg.getClass() == MathImplicitFunctionOperations.class)
                 mathImplicitFunction.add((MathImplicitFunctionOperations) arg);
         }
-        MathModule.Vector result = new MathModule.Vector();
+        MathModule.LinearAlgebra.Vector result = new MathModule.LinearAlgebra.Vector();
         for (var functionOperations : mathImplicitFunction) {
             ArrayList<Object> arg = new ArrayList<>();
             arg.add(functionOperations.calculatePoint(inPoint.getVectorX()).getVectorX());
