@@ -48,9 +48,9 @@ public abstract class Vector<T> extends NumericalBase {
         this.vector = new ArrayList<>(list);
     }
 
-    public abstract Vector<T> add(Vector<T> addVector) throws ReflectiveOperationException, IOException;
-    public abstract Vector<T> subtraction(Vector<T> subVector) throws ReflectiveOperationException, IOException;
-    public abstract Vector<T> scalarMultiply(Vector<T> multiplyVector);
-    public abstract Vector<T> vectorMultiply(Vector<T> multiplyVector);
+    public abstract Vector<? extends Number> add(ArrayList<Object> args) throws ReflectiveOperationException, IOException;
+    public abstract Vector<? extends Number> subtraction(ArrayList<Object> args) throws ReflectiveOperationException, IOException;
+    public abstract double scalarMultiply(ArrayList<Object> args);
+    public abstract Vector<? extends Number> constMultiply(ArrayList<Object> args) throws ReflectiveOperationException, IOException;
 
 }
