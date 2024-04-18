@@ -389,23 +389,21 @@ public class Matrix extends NumericalBase {
             return resultMatrix;
         }
     }
-    public Vector matrixAndVectorMultiplication(Vector addVector)
-    {
-        Matrix vectorMatrix = addVector.vectorToMatrix();
+    public Vector matrixAndVectorMultiplication(Vector addVector) throws ReflectiveOperationException, IOException {
+        Matrix vectorMatrix = addVector.toMatrix();
         Vector resultVector;
         resultVector = this.matrixMultiplication(vectorMatrix).matrixToVector();
         return resultVector;
     }
-    public Vector matrixToVector()
-    {
+    public Vector matrixToVector() throws ReflectiveOperationException, IOException {
         if (this.columnsCount != 1)
             throw new RuntimeException(PrettyOutput.ERROR + "Преобразование из матрицы в вектор невозможно." + PrettyOutput.RESET);
         else
         {
-            double[] convertVector = new double[this.rowsCount];
+            Vector convertVector = new Vector();
             for (int i = 0; i < this.rowsCount; i++)
-                convertVector[i] = this.getItem(i, 0);
-            return new Vector(convertVector, this.rowsCount);
+                convertVector.setElementAt(this.getItem(i, 0), i);
+            return convertVector;
         }
     }
     public Matrix transposition()

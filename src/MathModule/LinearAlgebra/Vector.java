@@ -1,333 +1,217 @@
 package MathModule.LinearAlgebra;
 
-import java.io.*;
-import java.text.*;
+import OtherThings.PrettyOutput;
+import OtherThings.UsefulThings;
+import Parsers.FileParser;
+import Parsers.InputStreamParser;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.DoubleStream;
+import java.util.regex.Pattern;
+//import daler_monkey
 
-import MathModule.NumericalBase;
-import OtherThings.*;
-
-public class Vector extends NumericalBase {
-    protected double[] vector;
-    protected int vectorSize;
-    public Vector(String pathToFile) throws FileNotFoundException
-    {
-        File input = new File(pathToFile);
-        Scanner scan = new Scanner(input);
-        String line = scan.nextLine();
-        String[] strArr = line.trim().split("\\s+");
-
-        this.vectorSize = strArr.length;
-        this.vector = new double[this.vectorSize];
-        for (int i = 0; i < strArr.length; i++)
-            this.vector[i] = Double.parseDouble(strArr[i]);
+public class Vector extends MathModule.Abstract.Vector<Double> {
+    public Vector(String pathToSettingsFile, String pathToVectorInputTxt, ArrayList<Double> vector)
+            throws ReflectiveOperationException, IOException {
+        if (pathToSettingsFile != null) {
+            super.setFields(pathToSettingsFile);
+            this.setFields(pathToSettingsFile);
+        } if (pathToVectorInputTxt != null && (this.vector == null || this.vector.isEmpty())) {
+            this.setVectorFromFile(pathToVectorInputTxt);
+        } else
+            this.vector = Objects.requireNonNullElseGet(vector, ArrayList::new);
+        this.vectorSize = this.vector.size();
     }
-    public Vector(double[] vector, int vectorSize)
-    {
-        this.vector = vector;
-        this.vectorSize = vectorSize;
+    public Vector(String pathToSettingsFile, String pathToVectorInputTxt)
+            throws IOException, ReflectiveOperationException {
+        this(pathToSettingsFile, pathToVectorInputTxt, null);
     }
-    public Vector(int vectorSize)
-    {
-        this.vectorSize = vectorSize;
-        this.vector = new double[vectorSize];
-        for (int i = 0; i < this.vectorSize; i++)
-            this.setItem(i, Double.NaN);
+    public Vector(String pathToVectorInputTxt) throws IOException, ReflectiveOperationException {
+        this(null, pathToVectorInputTxt);
     }
-    public Vector()
-    {
-        Scanner scan = new Scanner(System.in);
-        System.out.println(PrettyOutput.INPUT + "Введите размер вектора:" + PrettyOutput.RESET);
-        int vectorSize = scan.nextInt();
-
-        this.vectorSize = vectorSize;
-        this.vector = new double[vectorSize];
+    public Vector(String pathToSettingsFile, ArrayList<Double> vector) throws IOException, ReflectiveOperationException {
+        this(pathToSettingsFile, null, vector);
     }
-    protected void initializeVector()
-    {
-        Scanner scan = new Scanner(System.in);
-        System.out.println(PrettyOutput.INPUT + "Введите элементы вектора размерностью " + vectorSize + ":" + PrettyOutput.RESET);
-        for (int i = 0; i < vectorSize; i++)
-        {
-            int a = scan.nextInt();
-            this.vector[i] = a;
-        }
+    public Vector(ArrayList<Double> vector) throws IOException, ReflectiveOperationException {
+        this(null, vector);
     }
-    protected void initializeRandomVector(double from, double to)
-    {
-        Random random = new Random();
-        for (int i = 0; i < this.vectorSize; i++)
-            this.vector[i] = random.nextDouble(from, to);
+    public Vector() throws IOException, ReflectiveOperationException {
+        this((String) null);
     }
-    protected void initializeRandomIntVector(int from, int to)
-    {
-        Random random = new Random();
-        for (int i = 0; i < this.vectorSize; i++)
-            this.vector[i] = random.nextInt(from, to);
+    public static Vector createZeroVector(int vectorSize) throws ReflectiveOperationException, IOException {
+        ArrayList<Double> vector = new ArrayList<>(Collections.nCopies(vectorSize, 0.0));
+        return new Vector(vector);
     }
-    public int getVectorSize() { return this.vectorSize; }
-    public double[] getVector() { return this.vector; }
-    public double getItem(int index) { return this.vector[index]; }
-    public void setItem(int index, double replaceItem)
-    { this.vector[index] = replaceItem; }
-    public void setVector(double[] vector)
-    {
-        System.out.println(PrettyOutput.CHOOSE + "Вы уверены, что хотите заменить вектор?" + PrettyOutput.RESET);
-        this.vector = vector;
+    public Vector copy() throws ReflectiveOperationException, IOException {
+        return new Vector(this.vector);
     }
+    @Override
+    public int hashCode() {
+        return (int) ChebyshevNorm();
+    }
+    @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-    public MathModule.Vector cloneVector()
-    {
-        MathModule.Vector cloneVector = new Vector(this.vectorSize);
-        for (int i = 0; i < this.vectorSize; i++)
-            cloneVector.setItem(i, this.getItem(i));
-        return cloneVector;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return this.vector.equals(((Vector) obj).vector);
     }
     @Override
     public String toString() {
-        return Arrays.toString(this.vector);
+        return this.toString("");
     }
-    public static Vector createNewVector()
-    {
-        Vector vector = new Vector();
-        vector.initializeVector();
-        return vector;
-    }
-    public static Vector createNewVector(int vectorSize)
-    {
-        Vector vector = new Vector(vectorSize);
-        vector.initializeVector();
-        return vector;
-    }
-    public static Vector createNewRandomIntVector(int from, int to)
-    {
-        Vector vector = new Vector();
-        vector.initializeRandomIntVector(from, to);
-        return vector;
-    }
-    public static Vector createNewRandomIntVector(int vectorSize, int from, int to)
-    {
-        Vector vector = new Vector(vectorSize);
-        vector.initializeRandomIntVector(from, to);
-        return vector;
-    }
-    public static Vector createNewRandomVector(double from, double to)
-    {
-        Vector vector = new Vector();
-        vector.initializeRandomVector(from, to);
-        return vector;
-    }
-    public static Vector createNewRandomVector(int vectorSize, double from, double to)
-    {
-        Vector vector = new Vector(vectorSize);
-        vector.initializeRandomVector(from, to);
-        return vector;
-    }
-    public void printVector()
-    {
-        System.out.print(PrettyOutput.HEADER_OUTPUT + "\nВектор размерностью " + vectorSize + PrettyOutput.OUTPUT + ": \n { ");
-        for (int i = 0; i < vectorSize; i++)
-        {
-            System.out.print(this.getItem(i) + "; ");
+    public String toString(String outputFormatPattern) {
+        StringBuilder toString = new StringBuilder();
+        if (outputFormatPattern == null || outputFormatPattern.equals("\\s+") || outputFormatPattern.isEmpty()) {
+            for (var element : this.vector)
+                toString.append(element).append(" ");
+            return toString.toString();
         }
-        System.out.println("}" + PrettyOutput.RESET);
+        DecimalFormat outputFormat = new DecimalFormat(outputFormatPattern);
+        for (var element : this.vector)
+            toString.append(outputFormat.format(element)).append(" ");
+        return toString.toString();
     }
-    public void printFormattedVector()
-    {
-        System.out.print(PrettyOutput.HEADER_OUTPUT + "\nВектор размерностью " + vectorSize + PrettyOutput.OUTPUT + ": \n { ");
-        for (int i = 0; i < vectorSize; i++)
-        {
-            DecimalFormat shortOut = new DecimalFormat("#.##");
-            String result = shortOut.format(this.getItem(i));
-            System.out.print(result + "; ");
-        }
-        System.out.println("}" + PrettyOutput.RESET);
-    }
-    public void writeInFile(String pathToFile) throws IOException {
-        File output = new File(pathToFile);
-        FileWriter fileWriter = new FileWriter(output);
-        if (output.exists())
-        {
-            for (int i = 0; i < this.vectorSize; i++)
-                fileWriter.write(this.getItem(i) + " ");
+    public void setVectorFromFile(String pathToFile) throws IOException {
+        this.vector = new ArrayList<>();
+        List<List<Double>> inputVector = FileParser.readDataFromFile(pathToFile,
+                from -> {
+                    List<List<Double>> vectorsList = new ArrayList<>();
+                    for (var line : from) {
+                        List<String> linesElements = Arrays.asList(line.strip().split("\\s+"));
+                        vectorsList.add((List<Double>) UsefulThings.map(linesElements, Double::parseDouble));
+                    }
+                    return vectorsList;
+                });
+        if (inputVector.size() > 1) {
+            for (List<Double> vector : inputVector) {
+                if (vector.size() > 1)
+                    throw new RuntimeException(PrettyOutput.ERROR + "Невозможно считать вектор с файла\n" +
+                            "Размерность входных данных не соответсвует вектору\n" +
+                            "Веорятно в файле записан не вектор" + PrettyOutput.RESET);
+            }
+            inputVector.forEach(vector -> this.vector.add(vector.get(0)));
         } else {
-            boolean created = output.createNewFile();
-            if (created)
-            {
-                for (int i = 0; i < this.vectorSize; i++)
-                    fileWriter.write(this.getItem(i) + " ");
-            }
-            else
-            { throw new RuntimeException(PrettyOutput.ERROR + "Файл не создан по указанному пути: " +
-                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET); }
+            this.vector.addAll(inputVector.get(0));
         }
-        fileWriter.close();
     }
-    public void writeFormattedInFile(String pathToFile) throws IOException {
-        File output = new File(pathToFile);
-        FileWriter fileWriter = new FileWriter(output);
-        if (output.exists())
-        {
-            for (int i = 0; i < this.vectorSize; i++)
-            {
-                DecimalFormat shortOut = new DecimalFormat("#.##");
-                String result = shortOut.format(this.getItem(i));
-                fileWriter.write(result + " ");
-            }
-        } else {
-            boolean created = output.createNewFile();
-            if (created)
-            {
-                for (int i = 0; i < this.vectorSize; i++)
-                {
-                    DecimalFormat shortOut = new DecimalFormat("#.##");
-                    String result = shortOut.format(this.getItem(i));
-                    fileWriter.write(result + " ");
-                }
-            }
-            else
-            { throw new RuntimeException(PrettyOutput.ERROR + "Файл не создан по указанному пути: " +
-                    PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET); }
-        }
-        fileWriter.close();
+    public void writeVectorInFile(String pathToFile, String outputFormatPattern) throws IOException {
+        FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
     }
-    public void writeInDesiredFolder(String pathToFolder) throws IOException {
-        String pathToFile = pathToFolder + "/output.txt";
-        this.writeInFile(pathToFile);
-    }
-    public void writeInDesiredFolder(String pathToFolder, String fileName) throws IOException {
-        String pathToFile = pathToFolder + "/" + fileName;
-        this.writeInFile(pathToFile);
-    }
-    public void writeFormattedInDesiredFolder(String pathToFolder) throws IOException {
-        String pathToFile = pathToFolder + "/output.txt";
-        this.writeFormattedInFile(pathToFile);
-    }
-    public void writeFormattedInDesiredFolder(String pathToFolder, String fileName) throws IOException {
-        String pathToFile = pathToFolder + "/" + fileName;
-        this.writeFormattedInFile(pathToFile);
-    }
-    public void addItem(double item)
-    {
-        this.vectorSize ++;
-        double[] newVector = new double[this.vectorSize];
-        for (int i = 0; i < this.vectorSize; i++)
-        {
-            if (i != this.vectorSize - 1)
-                newVector[i] = this.getItem(i);
-            else
-                newVector[i] = item;
-        }
-        this.vector = newVector;
-    }
-    public void addItemBefore(double item, int index)
-    {
-        this.vectorSize ++;
-        double[] newVector = new double[this.vectorSize];
-        newVector[index] = item;
-        for (int i = 0; i < this.vectorSize; i++)
-        {
-            if (i < index)
-                newVector[i] = this.getItem(i);
-            else if (i > index)
-                newVector[i] = this.getItem(i - 1);
-        }
-        this.vector = newVector;
-    }
-    public void addItemAfter(double item, int index)
-    {
-        this.vectorSize ++;
-        double[] newVector = new double[this.vectorSize];
-        newVector[index + 1] = item;
-        for (int i = 0; i < this.vectorSize; i++)
-        {
-            if (i < index + 1)
-                newVector[i] = this.getItem(i);
-            else if (i > index + 1)
-                newVector[i] = this.getItem(i - 1);
-        }
-        this.vector = newVector;
-    }
-    public Vector partOfVector(int leftBorder, int rightBorder)
-    {
-        int newVectorSize = rightBorder - leftBorder + 1;
-        double[] vectorPart = new double[newVectorSize];
-        for (int oldIndex = leftBorder, newIndex = 0; oldIndex < rightBorder + 1; oldIndex++, newIndex++)
-            vectorPart[newIndex] = this.getItem(oldIndex);
-        return new Vector(vectorPart, newVectorSize);
-    }
-    public Vector constantMultiplication(double constant)
-    {
-        double[] newVector = this.vector;
-        for (int i = 0; i < this.vectorSize; i++)
-            newVector[i] *= constant;
-        return new Vector(newVector,this.vectorSize);
-    }
-    public Vector vectorAddition(Vector addVector)
-    {
-        if (this.vectorSize != addVector.getVectorSize())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT + "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
+    public void writeVectorInDesiredFolder(String pathToFolder, String fileName, String outputFormatPattern)
+            throws IOException {
+        Pattern pattern = Pattern.compile("\\w+\\.txt$");
+        String pathToFile;
+        if (pattern.matcher(pathToFolder).matches())
+            pathToFile = pathToFolder + fileName;
         else
-        {
-            double[] newVector = this.vector;
-            for (int i = 0; i < this.vectorSize; i++)
-                newVector[i] = this.getItem(i) + addVector.getItem(i);
-            return new Vector(newVector,this.vectorSize);
+            pathToFile = pathToFolder + fileName + ".txt";
+        FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
+    }
+    public void validateAbstractMethodsInput(ArrayList<Object> args) {
+        if (!InputStreamParser.isClassesInListAtOnce(args, Vector.class)) {
+            throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
+        } else {
+            Vector vector = (Vector) args.get(0);
+            if (vector.getVectorSize() != this.vector.size())
+                throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
+                        "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
         }
     }
-    public Vector vectorDifference(Vector subtractVector)
-    {
-        subtractVector = subtractVector.constantMultiplication(-1);
-        Vector resultVector;
-        resultVector = this.vectorAddition(subtractVector);
-        return resultVector;
-    }
-    public boolean isInVector(double item)
-    {
-        for (double i : this.vector)
-            if (i == item) return true;
-        return false;
-    }
-    public Matrix vectorToMatrix()
-    {
-        double[][] convertMatrix = new double[this.vectorSize][1];
+    @Override
+    public MathModule.Abstract.Vector<? extends Number> add(ArrayList<Object> args)
+            throws ReflectiveOperationException, IOException {
+        validateAbstractMethodsInput(args);
+        Vector sumVector = new Vector();
+        Vector addVector = (Vector) args.get(0);
         for (int i = 0; i < this.vectorSize; i++)
-            convertMatrix[i][0] = this.getItem(i);
-        return new Matrix(convertMatrix, this.vectorSize, 1);
+            sumVector.setElementAt(this.getElementAt(i) + addVector.getElementAt(i), i);
+        return sumVector;
     }
-    public double ChebyshevNorm()
-    {
+    @Override
+    public MathModule.Abstract.Vector<? extends Number> subtraction(ArrayList<Object> args)
+            throws ReflectiveOperationException, IOException {
+        validateAbstractMethodsInput(args);
+        Vector differenceVector = new Vector();
+        Vector subVector = (Vector) args.get(0);
+        for (int i = 0; i < this.vectorSize; i++)
+            differenceVector.setElementAt(this.getElementAt(i) - subVector.getElementAt(i), i);
+        return differenceVector;
+    }
+    @Override
+    public double scalarMultiply(ArrayList<Object> args) {
+        validateAbstractMethodsInput(args);
         double result = 0;
-        for (double i : this.vector)
-            result = Math.max(Math.abs(i), Math.abs(result));
+        Vector multiplyVector = (Vector) args.get(0);
+        for (int i = 0; i < this.vectorSize; i++)
+            result += this.getElementAt(i) + multiplyVector.getElementAt(i);
         return result;
     }
-    public void sort()
-    { Arrays.sort(this.vector); }
-    public boolean isZeroVector()
-    {
-        for (double item : this.vector)
-            if (item != 0 && Math.abs(item) > super.epsilon)
-                return false;
-        return true;
+    @Override
+    public MathModule.Abstract.Vector<? extends Number> constMultiply(ArrayList<Object> args)
+            throws ReflectiveOperationException, IOException {
+        if (!InputStreamParser.isClassesInListAtOnce(args, Number.class))
+            throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
+        Double constant = (Double) args.get(0);
+        Vector resultVector = new Vector();
+        this.vector.forEach(element -> resultVector.getVector().add(element * constant)) ;
+        return resultVector;
     }
-    public boolean isNanVector()
-    {
-        AtomicBoolean flag = new AtomicBoolean(false); // because flag uses in lambda expression
-        Arrays.stream(this.vector).forEach(item -> {
-            if (Double.isNaN(item))
+    public double ChebyshevNorm() {
+        double result = 0;
+        for (double element : this.vector)
+            result = Math.max(Math.abs(element), Math.abs(result));
+        return result;
+    }
+    /*
+     *  ИНЫМИ СЛОВАМИ ТРАНСПОНИРОВАНИЕ
+     */
+    public Matrix toMatrix() {
+        double[][] convertMatrix = new double[this.vectorSize][1];
+        for (int i = 0; i < this.vectorSize; i++)
+            convertMatrix[i][0] = this.getElementAt(i);
+        return new Matrix(convertMatrix, this.vectorSize, 1);
+    }
+    public Vector partOfVector(int leftBorder, int rightBorder) throws IOException, ReflectiveOperationException {
+        ArrayList<Double> vectorPart = new ArrayList<>();
+        for (int oldIndex = leftBorder, newIndex = 0; oldIndex < rightBorder + 1; oldIndex++, newIndex++)
+            vectorPart.set(newIndex, this.getElementAt(oldIndex));
+        return new Vector(vectorPart);
+    }
+    public void sort() {
+        this.vector.sort(Double::compareTo);
+    }
+    public static Vector sorted(Vector vector) {
+        vector.sort();
+        return vector;
+    }
+    public boolean isEmpty() {
+        return this.vector.isEmpty();
+    }
+    public boolean isZeroVector () {
+        AtomicBoolean flag = new AtomicBoolean(false);
+        this.vector.forEach(element -> {
+            if (element != 0 || Math.abs(element) > super.getEpsilon())
                 flag.set(true);
         });
         return flag.get();
     }
-    public List<Double> convertToList() {
-        return DoubleStream.of(this.vector).boxed().toList();
+    public boolean isNanVector () {
+        AtomicBoolean flag = new AtomicBoolean(false); // because flag uses in lambda expression
+        Arrays.stream(this.vector.toArray()).forEach(item -> {
+            if (Double.isNaN((Double) item))
+                flag.set(true);
+        });
+        return flag.get();
     }
-    public Vector convertListToVector(List<Double> list) {
-        return new Vector(list.stream().mapToDouble(Double::doubleValue).toArray(), list.size());
+    public boolean isInVector(double element) {
+        return this.vector.contains(element);
     }
 }
