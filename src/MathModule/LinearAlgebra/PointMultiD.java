@@ -3,20 +3,43 @@ package MathModule.LinearAlgebra;
 import MathModule.NumericalBase;
 import OtherThings.PrettyOutput;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Objects;
 
 public class PointMultiD extends NumericalBase {
     protected Vector x;
     protected double y;
-    public PointMultiD(Vector x, double y)
-    { this.x = x; this.y = y; }
-    public PointMultiD(String point, int pointDimension) throws ReflectiveOperationException, IOException {
-        this.x = new Vector();
-        this.setPointFromString(point, pointDimension);
+    public PointMultiD(String pathToPointMDInputFile, String stringPoint, Vector x, Double y, Integer pointDimension)
+            throws IOException, ReflectiveOperationException {
+        if (pointDimension != null) {
+            if (pathToPointMDInputFile != null && !pathToPointMDInputFile.isBlank()) {
+                this.x = readPointMultiDimFromFile(pathToPointMDInputFile, pointDimension).getVectorX();
+                this.y = readPointMultiDimFromFile(pathToPointMDInputFile, pointDimension).getY();
+            } else if (stringPoint != null && !stringPoint.isBlank() && this.x == null) {
+                this.setPointFromString(stringPoint, pointDimension);
+            }
+        } if ((pointDimension == null) && (this.x == null)) {
+            this.y = Objects.requireNonNullElse(y, Double.NaN);
+            if (x != null) {
+                this.x = x;
+            } else this.x = new Vector();
+        }
+    }
+
+    public PointMultiD(Vector x, double y) throws ReflectiveOperationException, IOException {
+        this(null, null, x, y, null);
+    }
+    public PointMultiD(String pathToPointMDInputFile, int pointDimension)
+            throws ReflectiveOperationException, IOException {
+        this(pathToPointMDInputFile, null, null, null, pointDimension);
+    }
+    public PointMultiD(int pointDimension, String point) throws ReflectiveOperationException, IOException {
+        this(null, point, null, null, pointDimension);
     }
     public PointMultiD() throws ReflectiveOperationException, IOException {
-        this.x = new Vector();
-        this.y = Double.NaN;
+        this(null, null, null, null, null);
     }
     public Vector getVectorX()
     { return x; }
@@ -34,16 +57,25 @@ public class PointMultiD extends NumericalBase {
     public String toString()
     { return this.x + ";" + this.y; }
     @Override
-    public boolean equals(Object obj)
-    { return super.equals(obj); }
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        PointMultiD point = (PointMultiD) obj;
+        return Objects.equals(x, point.x) && Objects.equals(y, point.y);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
     public PointMultiD copy() throws ReflectiveOperationException, IOException {
         PointMultiD clonePoint = new PointMultiD();
         clonePoint.setVectorX(this.getVectorX());
         clonePoint.setY(this.getY());
         return clonePoint;
     }
-    public void setPointFromString(String pointStr, int pointDimension)
-    {
+    public void setPointFromString(String pointStr, int pointDimension) {
         String[] splitPoint = pointStr.trim().split("\\s+");
         if (splitPoint.length == pointDimension)
         {
@@ -61,8 +93,12 @@ public class PointMultiD extends NumericalBase {
             throw new RuntimeException(PrettyOutput.ERROR +
                     "Ошибка! Неверно введена размерность точки или неверно введена сама точка" + PrettyOutput.RESET);
     }
-    public void print()
-    {
+    public static PointMultiD readPointMultiDimFromFile(String pathToPointMDInputFile, int pointDimension)
+            throws IOException, ReflectiveOperationException {
+        BufferedReader reader = new BufferedReader(new FileReader(pathToPointMDInputFile));
+        return new PointMultiD(reader.readLine(), pointDimension);
+    }
+    public void print() {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Точка размерностью: " +
                 (this.getVectorX().getVectorSize() + 1) + PrettyOutput.RESET);
         System.out.println("(" + this + ")");
