@@ -18,6 +18,20 @@ public class FileParser {
             linesList.add(fileScanner.nextLine());
         return how.apply(linesList);
     }
+    public static void writeDataInFile(String pathToFile, String objectToString) throws IOException {
+        File output = new File(pathToFile);
+        FileWriter fileWriter = new FileWriter(output);
+        if (output.exists()) {
+            fileWriter.write(objectToString);
+        } else {
+            if (output.createNewFile()) {
+                fileWriter.write(objectToString);
+            } else
+                throw new RuntimeException(PrettyOutput.ERROR + "Файл не создан по указанному пути: " +
+                        PrettyOutput.COMMENT + pathToFile + PrettyOutput.RESET);
+        }
+        fileWriter.close();
+    }
 
     public static class SettingsParser extends FileParser {
         public enum Settings {
