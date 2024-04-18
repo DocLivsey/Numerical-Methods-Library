@@ -80,9 +80,9 @@ public class Vector extends NumericalBase {
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-    public Vector cloneVector()
+    public MathModule.Vector cloneVector()
     {
-        Vector cloneVector = new Vector(this.vectorSize);
+        MathModule.Vector cloneVector = new Vector(this.vectorSize);
         for (int i = 0; i < this.vectorSize; i++)
             cloneVector.setItem(i, this.getItem(i));
         return cloneVector;
