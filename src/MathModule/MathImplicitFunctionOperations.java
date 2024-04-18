@@ -2,6 +2,7 @@ package MathModule;
 
 import MathModule.LinearAlgebra.PointMultiD;
 import MathModule.LinearAlgebra.PointNormComparator;
+import MathModule.LinearAlgebra.Vector;
 import OtherThings.PrettyOutput;
 
 import java.io.*;
@@ -106,7 +107,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     public void printFunction()
     { System.out.println(PrettyOutput.HEADER_OUTPUT + "Функция\n" + PrettyOutput.OUTPUT
             + this.toString() + PrettyOutput.RESET); }
-    public PointMultiD calculatePoint(MathModule.Vector x) throws ReflectiveOperationException, IOException {
+    public PointMultiD calculatePoint(MathModule.LinearAlgebra.Vector x) throws ReflectiveOperationException, IOException {
         if (Math.abs(this.function.function(x).getY()) <= super.epsilon)
             return new PointMultiD(x, 0);
         if (Math.abs(this.function.function(x).getY()) == Double.POSITIVE_INFINITY)
@@ -121,7 +122,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     }
     public double partialDifferential(int variableIndex, PointMultiD point)
             throws ReflectiveOperationException, IOException {
-        MathModule.Vector dx = point.getVectorX().copy();
+        MathModule.LinearAlgebra.Vector dx = point.getVectorX().copy();
         dx.setElementAt(point.getX(variableIndex) + super.epsilon, variableIndex);
         double dy;
         if (Double.isNaN(point.getY()))

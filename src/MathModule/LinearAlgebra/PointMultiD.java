@@ -1,31 +1,30 @@
 package MathModule.LinearAlgebra;
 
 import MathModule.NumericalBase;
-import MathModule.Vector;
 import OtherThings.PrettyOutput;
 
 import java.io.IOException;
 
 public class PointMultiD extends NumericalBase {
-    protected MathModule.Vector x;
+    protected Vector x;
     protected double y;
-    public PointMultiD(MathModule.Vector x, double y)
+    public PointMultiD(Vector x, double y)
     { this.x = x; this.y = y; }
     public PointMultiD(String point, int pointDimension) throws ReflectiveOperationException, IOException {
-        this.x = new MathModule.Vector();
+        this.x = new Vector();
         this.setPointFromString(point, pointDimension);
     }
     public PointMultiD() throws ReflectiveOperationException, IOException {
         this.x = new Vector();
         this.y = Double.NaN;
     }
-    public MathModule.Vector getVectorX()
+    public Vector getVectorX()
     { return x; }
     public double getX(int index)
     { return x.getElementAt(index); }
     public double getY()
     { return y; }
-    public void setVectorX(MathModule.Vector x)
+    public void setVectorX(Vector x)
     { this.x = x; }
     public void setX(int index, double x)
     { this.x.setElementAt(x, index); }

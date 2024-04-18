@@ -1,6 +1,7 @@
 package MathModule;
 
 import MathModule.LinearAlgebra.PointMultiD;
+import MathModule.LinearAlgebra.Vector;
 
 import java.io.IOException;
 
