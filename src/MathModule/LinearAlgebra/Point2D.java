@@ -4,6 +4,8 @@ import MathModule.NumericalBase;
 import OtherThings.*;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Point2D extends NumericalBase {
     protected double x;
@@ -34,8 +36,7 @@ public class Point2D extends NumericalBase {
         return point2D.getY() == this.getY() && point2D.getX() == this.getX();
     }
     public Point2D copy() { return new Point2D(this.getX(), this.getY()); }
-    public static Point2D setXFromString(String xStr)
-    {
+    public static Point2D setXFromString(String xStr) {
         double x;
         if (NumericalBase.isNumeric(xStr))
         {
@@ -44,8 +45,7 @@ public class Point2D extends NumericalBase {
         }
         return new Point2D();
     }
-    public static Point2D setPairFromString(String pair)
-    {
+    public static Point2D setPairFromString(String pair) {
         double x, y;
         if (NumericalBase.severalNumeric(pair))
         {
@@ -61,8 +61,9 @@ public class Point2D extends NumericalBase {
         String pair = reader.readLine();
         return Point2D.setPairFromString(pair);
     }
-    public boolean isNanPoint()
-    { return Double.isNaN(this.getX()) || Double.isNaN(this.getY()); }
-    public void print()
-    { System.out.println(PrettyOutput.OUTPUT + "(" + this + ")" + PrettyOutput.RESET); }
+    public Vector toVector() throws ReflectiveOperationException, IOException {
+        return new Vector(new ArrayList<>(List.of(this.x, this.y)));
+    }
+    public boolean isNanPoint() { return Double.isNaN(this.getX()) || Double.isNaN(this.getY()); }
+    public void print() { System.out.println(PrettyOutput.OUTPUT + "(" + this + ")" + PrettyOutput.RESET); }
 }
