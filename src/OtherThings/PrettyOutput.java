@@ -37,7 +37,7 @@ public class PrettyOutput {
 
     // Underline
     public static final String BLACK_UNDERLINED = "\033[4;30m";  // BLACK
-    public static final String RED_UNDERLINED = "\033[4;31m";    // RED
+    public static final String ERROR_UNDERLINED = "\033[4;31m";    // RED
     public static final String GREEN_UNDERLINED = "\033[4;32m";  // GREEN
     public static final String YELLOW_UNDERLINED = "\033[4;33m"; // YELLOW
     public static final String BLUE_UNDERLINED = "\033[4;34m";   // BLUE
