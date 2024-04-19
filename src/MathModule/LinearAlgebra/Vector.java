@@ -1,5 +1,6 @@
 package MathModule.LinearAlgebra;
 
+import MathModule.Abstract.AbstractVector;
 import OtherThings.PrettyOutput;
 import OtherThings.UsefulThings;
 import Parsers.FileParser;
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 //import daler_monkey
 
-public class Vector extends MathModule.Abstract.Vector<Double> {
+public class Vector extends AbstractVector<Double> {
     public Vector(String pathToSettingsFile, String pathToVectorInputTxt, ArrayList<Double> vector)
             throws ReflectiveOperationException, IOException {
         if (pathToSettingsFile != null) {
@@ -111,55 +112,55 @@ public class Vector extends MathModule.Abstract.Vector<Double> {
             pathToFile = pathToFolder + fileName + ".txt";
         FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
     }
-    public void validateAbstractMethodsInput(ArrayList<Object> args) {
-        if (!InputStreamParser.isClassesInListAtOnce(args, Vector.class)) {
-            throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+    public void validateAbstractMethodsInput(Object... arguments) {
+        if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Vector.class)) {
+            throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
                     "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
                     PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
         } else {
-            Vector vector = (Vector) args.get(0);
+            Vector vector = (Vector) arguments[0];
             if (vector.getVectorSize() != this.vector.size())
                 throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
                         "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
         }
     }
     @Override
-    public MathModule.Abstract.Vector<? extends Number> add(ArrayList<Object> args)
+    public AbstractVector<? extends Number> add(Object... arguments)
             throws ReflectiveOperationException, IOException {
-        validateAbstractMethodsInput(args);
+        validateAbstractMethodsInput(arguments);
         Vector sumVector = new Vector();
-        Vector addVector = (Vector) args.get(0);
+        Vector addVector = (Vector) arguments[0];
         for (int i = 0; i < this.vectorSize; i++)
             sumVector.setElementAt(this.getElementAt(i) + addVector.getElementAt(i), i);
         return sumVector;
     }
     @Override
-    public MathModule.Abstract.Vector<? extends Number> subtraction(ArrayList<Object> args)
+    public AbstractVector<? extends Number> subtraction(Object... arguments)
             throws ReflectiveOperationException, IOException {
-        validateAbstractMethodsInput(args);
+        validateAbstractMethodsInput(arguments);
         Vector differenceVector = new Vector();
-        Vector subVector = (Vector) args.get(0);
+        Vector subVector = (Vector) arguments[0];
         for (int i = 0; i < this.vectorSize; i++)
             differenceVector.setElementAt(this.getElementAt(i) - subVector.getElementAt(i), i);
         return differenceVector;
     }
     @Override
-    public double scalarMultiply(ArrayList<Object> args) {
-        validateAbstractMethodsInput(args);
+    public double scalarMultiply(Object... arguments) {
+        validateAbstractMethodsInput(arguments);
         double result = 0;
-        Vector multiplyVector = (Vector) args.get(0);
+        Vector multiplyVector = (Vector) arguments[0];
         for (int i = 0; i < this.vectorSize; i++)
             result += this.getElementAt(i) + multiplyVector.getElementAt(i);
         return result;
     }
     @Override
-    public MathModule.Abstract.Vector<? extends Number> constMultiply(ArrayList<Object> args)
+    public AbstractVector<? extends Number> constMultiply(Object... arguments)
             throws ReflectiveOperationException, IOException {
-        if (!InputStreamParser.isClassesInListAtOnce(args, Number.class))
-            throw new RuntimeException(PrettyOutput.RED_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+        if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Number.class))
+            throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
                     "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
                     PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
-        Double constant = (Double) args.get(0);
+        Double constant = (Double) arguments[0];
         Vector resultVector = new Vector();
         this.vector.forEach(element -> resultVector.getVector().add(element * constant)) ;
         return resultVector;
