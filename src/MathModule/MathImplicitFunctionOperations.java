@@ -94,7 +94,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
         while (fileScan.hasNextLine())
         {
             String point = fileScan.nextLine();
-            PointMultiD pointMultiD = new PointMultiD(point, this.dimension + 1);
+            PointMultiD pointMultiD = new PointMultiD(this.dimension + 1, point);
             this.addPoint(pointMultiD);
         }
     }
