@@ -114,12 +114,12 @@ public class Vector extends AbstractVector<Double> {
     }
     public void validateAbstractMethodsInput(Object... arguments) {
         if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Vector.class)) {
-            throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
+            throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "\nОшибка! Неверное количество переданных аргументов\n" +
                     "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
                     PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
         } else {
             Vector vector = (Vector) arguments[0];
-            if (vector.getVectorSize() != this.vector.size())
+            if (vector.getVector().size() != this.vector.size())
                 throw new RuntimeException(PrettyOutput.ERROR + "Размеры векторов разные \n" + PrettyOutput.COMMENT +
                         "Пожалуйста, введите вектора одного размера" + PrettyOutput.RESET);
         }
@@ -131,7 +131,7 @@ public class Vector extends AbstractVector<Double> {
         Vector sumVector = new Vector();
         Vector addVector = (Vector) arguments[0];
         for (int i = 0; i < this.vectorSize; i++)
-            sumVector.setElementAt(this.getElementAt(i) + addVector.getElementAt(i), i);
+            sumVector.addElement(this.getElementAt(i) + addVector.getElementAt(i));
         return sumVector;
     }
     @Override
@@ -141,7 +141,7 @@ public class Vector extends AbstractVector<Double> {
         Vector differenceVector = new Vector();
         Vector subVector = (Vector) arguments[0];
         for (int i = 0; i < this.vectorSize; i++)
-            differenceVector.setElementAt(this.getElementAt(i) - subVector.getElementAt(i), i);
+            differenceVector.addElement(this.getElementAt(i) - subVector.getElementAt(i));
         return differenceVector;
     }
     @Override
@@ -156,10 +156,11 @@ public class Vector extends AbstractVector<Double> {
     @Override
     public AbstractVector<? extends Number> constMultiply(Object... arguments)
             throws ReflectiveOperationException, IOException {
-        if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Number.class))
+        if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Double.class))
             throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "Ошибка! Неверное количество переданных аргументов\n" +
-                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Vector.class +
-                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "вектор с которым суммируем\n" + PrettyOutput.RESET);
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Double.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "Констаната на которую умножаем " +
+                    "вектор\n" + PrettyOutput.RESET);
         Double constant = (Double) arguments[0];
         Vector resultVector = new Vector();
         this.vector.forEach(element -> resultVector.getVector().add(element * constant)) ;

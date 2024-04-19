@@ -31,21 +31,25 @@ public abstract class AbstractVector<T> extends NumericalBase {
         LinkedList<T> list = new LinkedList<>(this.vector);
         list.add(index, element);
         this.vector = new ArrayList<>(list);
+        this.vectorSize = this.vector.size();
     }
     public void addElement(T element) {
         LinkedList<T> list = new LinkedList<>(this.vector);
         list.add(element);
         this.vector = new ArrayList<>(list);
+        this.vectorSize = this.vector.size();
     }
     public void removeElementAt(int index) {
         LinkedList<T> list = new LinkedList<>(this.vector);
         list.remove(index);
         this.vector = new ArrayList<>(list);
+        this.vectorSize = this.vector.size();
     }
     public void removeElement(T element) {
         LinkedList<T> list = new LinkedList<>(this.vector);
         list.remove(element);
         this.vector = new ArrayList<>(list);
+        this.vectorSize = this.vector.size();
     }
 
     public abstract AbstractVector<? extends Number> add(Object... arguments)
