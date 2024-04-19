@@ -18,6 +18,7 @@ public class PointMultiD extends NumericalBase {
                 this.x = readPointMultiDimFromFile(pathToPointMDInputFile, pointDimension).getVectorX();
                 this.y = readPointMultiDimFromFile(pathToPointMDInputFile, pointDimension).getY();
             } else if (stringPoint != null && !stringPoint.isBlank() && this.x == null) {
+                this.x = new Vector();
                 this.setPointFromString(stringPoint, pointDimension);
             }
         } if ((pointDimension == null) && (this.x == null)) {
@@ -41,18 +42,13 @@ public class PointMultiD extends NumericalBase {
     public PointMultiD() throws ReflectiveOperationException, IOException {
         this(null, null, null, null, null);
     }
-    public Vector getVectorX()
-    { return x; }
-    public double getX(int index)
-    { return x.getElementAt(index); }
-    public double getY()
-    { return y; }
-    public void setVectorX(Vector x)
-    { this.x = x; }
-    public void setX(int index, double x)
-    { this.x.setElementAt(x, index); }
-    public void setY(double y)
-    { this.y = y; }
+    public Vector getVectorX() { return x; }
+    public double getX(int index) { return x.getElementAt(index); }
+    public double getY() { return y; }
+    public void setVectorX(Vector x) { this.x = x; }
+    public void setX(int index, double x) { this.x.setElementAt(x, index); }
+    public void setY(double y) { this.y = y; }
+    public void addX(double x) { this.x.addElement(x); }
     @Override
     public String toString()
     { return this.x + ";" + this.y; }
@@ -80,13 +76,13 @@ public class PointMultiD extends NumericalBase {
         if (splitPoint.length == pointDimension)
         {
             for (int i = 0; i < pointDimension - 1; i++)
-                this.setX(i, Double.parseDouble(splitPoint[i]));
+                this.addX(Double.parseDouble(splitPoint[i]));
             this.y = Double.parseDouble(splitPoint[pointDimension - 1]);
         }
         else if (splitPoint.length == pointDimension - 1)
         {
-            for (int i = 0; i < splitPoint.length; i++)
-                this.setX(i, Double.parseDouble(splitPoint[i]));
+            for (String string : splitPoint)
+                this.addX(Double.parseDouble(string));
             this.y = Double.NaN;
         }
         else
@@ -96,7 +92,7 @@ public class PointMultiD extends NumericalBase {
     public static PointMultiD readPointMultiDimFromFile(String pathToPointMDInputFile, int pointDimension)
             throws IOException, ReflectiveOperationException {
         BufferedReader reader = new BufferedReader(new FileReader(pathToPointMDInputFile));
-        return new PointMultiD(reader.readLine(), pointDimension);
+        return new PointMultiD(pointDimension, reader.readLine());
     }
     public void print() {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Точка размерностью: " +
