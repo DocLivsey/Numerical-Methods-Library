@@ -107,7 +107,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     public void printFunction()
     { System.out.println(PrettyOutput.HEADER_OUTPUT + "Функция\n" + PrettyOutput.OUTPUT
             + this.toString() + PrettyOutput.RESET); }
-    public PointMultiD calculatePoint(MathModule.LinearAlgebra.Vector x) throws ReflectiveOperationException, IOException {
+    public PointMultiD calculatePoint(Vector x) throws ReflectiveOperationException, IOException {
         if (Math.abs(this.function.function(x).getY()) <= super.epsilon)
             return new PointMultiD(x, 0);
         if (Math.abs(this.function.function(x).getY()) == Double.POSITIVE_INFINITY)
@@ -122,7 +122,7 @@ public class MathImplicitFunctionOperations extends NumericalBase {
     }
     public double partialDifferential(int variableIndex, PointMultiD point)
             throws ReflectiveOperationException, IOException {
-        MathModule.LinearAlgebra.Vector dx = point.getVectorX().copy();
+        Vector dx = point.getVectorX().copy();
         dx.setElementAt(point.getX(variableIndex) + super.epsilon, variableIndex);
         double dy;
         if (Double.isNaN(point.getY()))
