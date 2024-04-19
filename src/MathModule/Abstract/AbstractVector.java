@@ -5,7 +5,7 @@ import MathModule.*;
 import java.io.*;
 import java.util.*;
 
-public abstract class Vector<T> extends NumericalBase {
+public abstract class AbstractVector<T> extends NumericalBase {
     protected ArrayList<T> vector;
     protected int vectorSize;
     public ArrayList<T> getVector() {
@@ -48,9 +48,12 @@ public abstract class Vector<T> extends NumericalBase {
         this.vector = new ArrayList<>(list);
     }
 
-    public abstract Vector<? extends Number> add(ArrayList<Object> args) throws ReflectiveOperationException, IOException;
-    public abstract Vector<? extends Number> subtraction(ArrayList<Object> args) throws ReflectiveOperationException, IOException;
-    public abstract double scalarMultiply(ArrayList<Object> args);
-    public abstract Vector<? extends Number> constMultiply(ArrayList<Object> args) throws ReflectiveOperationException, IOException;
+    public abstract AbstractVector<? extends Number> add(Object... arguments)
+            throws ReflectiveOperationException, IOException;
+    public abstract AbstractVector<? extends Number> subtraction(Object... arguments)
+            throws ReflectiveOperationException, IOException;
+    public abstract double scalarMultiply(Object... arguments) throws IOException, ReflectiveOperationException;
 
+    public abstract AbstractVector<? extends Number> constMultiply(Object... arguments)
+            throws ReflectiveOperationException, IOException;
 }
