@@ -157,7 +157,7 @@ public class FileParser {
             }
             HashMap<Settings, String> settingsPartTable = getSettingsPartTable(pathToSettingsFile);
             HashMap<String, Object> fieldsTable = new HashMap<>();
-            List<Field> fields = Arrays.asList(object.getClass().getDeclaredFields());
+            List<Field> fields = UsefulThings.getAllFields(object.getClass());
             if (settingsPartTable.containsKey(Settings.FIELDS))
             {
                 String fieldsPart = settingsPartTable.get(Settings.FIELDS);
