@@ -592,6 +592,7 @@ public class Matrix extends NumericalBase {
     }
     public boolean isMatrixSingular() { return this.calculateDeterminant() == 0;}
 
+    // IN PLANS MAKE THIS A CHILD CLASS OF PAIR<DOUBLE, VECTOR>
     public static class EigenPair {
         protected double eigenValue;
         protected Vector eigenVector;

@@ -8,6 +8,7 @@ import java.util.*;
 public abstract class AbstractVector<T> extends NumericalBase {
     protected ArrayList<T> vector;
     protected int vectorSize;
+
     public ArrayList<T> getVector() {
         return vector;
     }

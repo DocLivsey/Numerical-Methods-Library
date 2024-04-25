@@ -6,6 +6,7 @@ import OtherThings.PrettyOutput;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class PointMultiD extends NumericalBase {
@@ -93,6 +94,12 @@ public class PointMultiD extends NumericalBase {
             throws IOException, ReflectiveOperationException {
         BufferedReader reader = new BufferedReader(new FileReader(pathToPointMDInputFile));
         return new PointMultiD(pointDimension, reader.readLine());
+    }
+    public Vector toVector() throws ReflectiveOperationException, IOException {
+        return new Vector(new ArrayList<>(){{
+            this.addAll(x.getVector());
+            this.add(y);
+        }});
     }
     public void print() {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Точка размерностью: " +
