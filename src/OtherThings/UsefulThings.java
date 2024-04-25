@@ -1,5 +1,6 @@
 package OtherThings;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -23,5 +24,13 @@ public class UsefulThings {
     }
     public static<T> T[] convertCollectionToArray(Collection<T> collection) {
         return (T[]) collection.stream().toArray();
+    }
+
+    public static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        for (var c = clazz; c != null; c = c.getSuperclass()) {
+            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+        }
+        return fields;
     }
 }
