@@ -41,6 +41,19 @@ public class Vector extends AbstractVector<Double> {
     public Vector() throws IOException, ReflectiveOperationException {
         this((String) null);
     }
+    public static Vector createRandomVector(Integer size, Double from, Double to)
+            throws ReflectiveOperationException, IOException {
+        Random rand = new Random();
+        System.out.println(from + " " + to);
+        Integer finalSize = size == null ? rand.nextInt() : size;
+        double finalFrom = from ==null ? rand.nextDouble() : from;
+        double finalTo = to ==null ? rand.nextDouble() : to;
+        System.out.println(finalSize + " " + finalFrom + " " + finalTo);
+        return new Vector(new ArrayList<>(){{
+            for (int i = 0; i < finalSize; i++)
+                this.add(rand.nextDouble(finalFrom, finalTo));
+        }});
+    }
     public static Vector createZeroVector(int vectorSize) throws ReflectiveOperationException, IOException {
         ArrayList<Double> vector = new ArrayList<>(Collections.nCopies(vectorSize, 0.0));
         return new Vector(vector);
