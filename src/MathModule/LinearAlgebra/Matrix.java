@@ -6,6 +6,7 @@ import java.util.*;
 
 import MathModule.NumericalBase;
 import OtherThings.*;
+import Parsers.InputStreamParser;
 
 public class Matrix extends NumericalBase {
     protected int rowsCount;
@@ -163,6 +164,15 @@ public class Matrix extends NumericalBase {
         Matrix matrix = new Matrix(rowsCount, columnsCount);
         matrix.initializeRandomMatrix(from, to);
         return matrix;
+    }
+    public void createSingleMatrix()
+    {
+        for (int i = 0; i < this.rowsCount; i++)
+            for (int j = 0; j < this.columnsCount; j++)
+            {
+                if (i == j) this.setItem(i, j, 1);
+                else this.setItem(i, j, 0);
+            }
     }
     public void printMatrix()
     {
@@ -389,6 +399,13 @@ public class Matrix extends NumericalBase {
             return resultMatrix;
         }
     }
+    public Matrix matrixPow(int pow)
+    {
+        Matrix matrixPow = this.cloneMatrix();
+        for (int i = 0; i < pow - 1; i++)
+            matrixPow = matrixPow.matrixMultiplication(this).cloneMatrix();
+        return matrixPow;
+    }
     public Vector matrixAndVectorMultiplication(Vector addVector) throws ReflectiveOperationException, IOException {
         Matrix vectorMatrix = addVector.toMatrix();
         Vector resultVector;
@@ -573,6 +590,117 @@ public class Matrix extends NumericalBase {
                     return true;
         return false;
     }
-    public boolean isMatrixSingular()
-    { return this.calculateDeterminant() == 0; }
+    public boolean isMatrixSingular() { return this.calculateDeterminant() == 0;}
+
+    public static class EigenPair {
+        protected double eigenValue;
+        protected Vector eigenVector;
+        public EigenPair(double eigenValue, Vector eigenVector)
+        { this.eigenValue = eigenValue; this.eigenVector = eigenVector; }
+        public double getEigenValue() {
+            return eigenValue;
+        }
+        public Vector getEigenVector() {
+            return eigenVector;
+        }
+        public void setEigenValue(double eigenValue) {
+            this.eigenValue = eigenValue;
+        }
+        public void setEigenVector(Vector eigenVector) {
+            this.eigenVector = eigenVector;
+        }
+        @Override
+        public String toString()
+        { return "eigenValue = " + this.eigenValue + " eigenVector = " + this.eigenVector.toString(); }
+        public static boolean isTheVectorSignChanged(Vector eigenVectorBefore, Vector eigenVectorAfter)
+        {
+            boolean flagIsChanged = true;
+            for (int i = 0; i < eigenVectorBefore.getVectorSize(); i++)
+                if (Math.round(eigenVectorAfter.getElementAt(i) * eigenVectorBefore.getElementAt(i)) > 0)
+                    flagIsChanged = false;
+            return flagIsChanged;
+        }
+    }
+
+    public double PM_AlgorithmFindBiggestEigenPair(Vector y_0) throws ReflectiveOperationException, IOException {
+        if (this.rowsCount != this.columnsCount)
+            throw new RuntimeException(PrettyOutput.ERROR + "Для нахождения собственной пары матрица " +
+                    "должна быть квадратной" + PrettyOutput.RESET);
+        System.out.println(PrettyOutput.ERROR + "Внимание, степенной метод работает только для матриц простой структуры"
+                + PrettyOutput.RESET);
+        double maxAbsLambda;
+        if (y_0 == null || y_0.isEmpty())
+            y_0 = Vector.createRandomVector(this.rowsCount, -10.0, 10.0);
+        double normaY = y_0.ChebyshevNorm();
+        Vector x_0 = (Vector) y_0.copy().constMultiply(1 / normaY);
+        double lambda_K = 0;
+        Vector xPrev = x_0.copy();
+        do {
+            maxAbsLambda = lambda_K;
+            Vector yNew = this.matrixAndVectorMultiplication(xPrev).copy();
+            normaY = yNew.ChebyshevNorm();
+            for (int i = 0; i < xPrev.getVectorSize(); i++)
+                if (Math.abs(xPrev.getElementAt(i)) > this.getEpsilon())
+                    lambda_K += (yNew.getElementAt(i) / xPrev.getElementAt(i));
+            Vector xNew = (Vector) yNew.copy().constMultiply(1 / normaY);
+            xPrev = xNew.copy();
+        } while(Math.abs(lambda_K - maxAbsLambda) >= this.getEpsilon());
+        maxAbsLambda = lambda_K;
+        return maxAbsLambda;
+    }
+    public EigenPair powMethod(int pow, Vector y_0) throws ReflectiveOperationException, IOException {
+        if (this.rowsCount != this.columnsCount)
+            throw new RuntimeException(PrettyOutput.ERROR + "Для нахождения собственной пары матрица " +
+                    "должна быть квадратной" + PrettyOutput.RESET);
+        int iterationsCount = 1;
+        double maxAbsLambda;
+        System.out.println(PrettyOutput.ERROR + "Внимание, степенной метод работает только для " +
+                "матриц простой структуры" + PrettyOutput.RESET);
+        if (y_0 == null)
+            y_0 = Vector.createRandomVector(this.rowsCount, -10.0, 10.0);
+        double normaY = y_0.ChebyshevNorm();
+        Vector x_0 = (Vector) y_0.copy().constMultiply(1 / normaY);
+        double lambda_K = 0;
+        Vector xPrev = x_0.copy();
+        do {
+            iterationsCount++;
+            maxAbsLambda = lambda_K;
+            Vector yNew = this.matrixPow(pow).cloneMatrix().matrixAndVectorMultiplication(xPrev).copy();
+            normaY = yNew.ChebyshevNorm();
+            for (int i = 0; i < xPrev.getVectorSize(); i++)
+                if (Math.abs(xPrev.getElementAt(i)) > this.getEpsilon())
+                    lambda_K = (yNew.getElementAt(i) / xPrev.getElementAt(i));
+            lambda_K = Math.pow(Math.abs(lambda_K), (double) 1 / pow);
+            Vector xNew = (Vector) yNew.copy().constMultiply(1 / normaY);
+            xPrev = xNew.copy();
+        } while(Math.abs(lambda_K - maxAbsLambda) >= this.getEpsilon());
+        maxAbsLambda = lambda_K;
+        if (EigenPair.isTheVectorSignChanged(xPrev, this.matrixAndVectorMultiplication(xPrev)))
+            maxAbsLambda = -maxAbsLambda;
+        System.out.println("COUNT OF ITERATIONS: " + iterationsCount);
+        return new EigenPair(maxAbsLambda, xPrev);
+    }
+    /* СТЕПЕННОЙ МЕТОД
+    АЛГОРИТМ ВЫЧИСЛЕНИЯ НАИБОЛЬШЕГО ПО МОДУЛЮ СОБСТВЕННОГО ЗНАЧЕНИЯ МАТРИЦЫ */
+    public EigenPair advancedPowMethod(int pow, Vector y_0) throws ReflectiveOperationException, IOException {
+        switch (InputStreamParser.parseChoiceOfTwo("Max", "Min"))
+        {
+            case 1:
+                return this.powMethod(pow, y_0);
+            case 2:
+                EigenPair biggestPair = this.powMethod(pow, y_0);
+                double biggestLambda = biggestPair.getEigenValue();
+                Matrix singleMatrix = new Matrix(this.rowsCount, this.columnsCount);
+                singleMatrix.createSingleMatrix();
+                singleMatrix = singleMatrix.constantMultiplication(-biggestLambda);
+                Matrix newMatrix = this.matrixAddition(singleMatrix).cloneMatrix();
+                EigenPair newPair = newMatrix.powMethod(pow, y_0);
+                return new EigenPair(biggestLambda + newPair.getEigenValue(), newPair.getEigenVector());
+            default:
+                System.out.println(PrettyOutput.ERROR + "ERROR" + PrettyOutput.RESET);
+        }
+        return new EigenPair(Double.NaN, null);
+    }
+    /* ПРОДВИНУТЫЙ СТЕПЕННОЙ МЕТОД
+    АЛГОРИТМ ВЫЧИСЛЕНИЯ НАИБОЛЬШЕГО ИЛИ НАИМЕНЬШЕГО ПО МОДУЛЮ СОБСТВЕННОГО ЗНАЧЕНИЯ МАТРИЦЫ */
 }
