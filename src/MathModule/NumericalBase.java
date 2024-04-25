@@ -31,14 +31,22 @@ public class NumericalBase {
     }
     public void setFields(String pathToSettingsFile) throws IOException, ReflectiveOperationException {
         HashMap<String, Object> fields = FileParser.SettingsParser.getFieldsTable(pathToSettingsFile, this);
-        List<String> actualFields = (List<String>) UsefulThings.map(
-                Arrays.asList(this.getClass().getDeclaredFields()), Field::getName);
+        List<String> allActualFields = (List<String>) UsefulThings.map(
+                UsefulThings.getAllFields(this.getClass()), Field::getName);
         for (var field : fields.keySet())
         {
-            if (InputStreamParser.stringMatchesAnyItemOfList(actualFields, field, "\\s+"))
+            if (InputStreamParser.stringMatchesAnyItemOfList(allActualFields, field, "\\s+"))
             {
-                Field actualField = this.getClass().getDeclaredField(field);
-                actualField.set(this, fields.get(field));
+                Field actualField;
+                for (var clazz = this.getClass(); clazz != null;
+                     clazz = (Class<? extends NumericalBase>) clazz.getSuperclass()) {
+                    try {
+                        actualField = clazz.getDeclaredField(field);
+                        actualField.set(this, fields.get(field));
+                    } catch (NoSuchFieldException e) {
+                        System.out.println(e.getMessage() + " not in class: " + clazz.getName());
+                    }
+                }
             }
         }
     }
