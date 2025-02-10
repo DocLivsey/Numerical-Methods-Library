@@ -3,6 +3,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+**/output.txt
+**/input.txt
+
 ### Eclipse ###
 .apt_generated
 .classpath
