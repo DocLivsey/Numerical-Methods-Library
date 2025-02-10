@@ -9,7 +9,7 @@ import java.util.*;
 
 public class NumericalBase {
     protected final TreeSet<String> variablesList = new TreeSet<>(List.of("epsilon"));
-    protected final HashMap<String, Double> parametersTable = new HashMap<>();
+    protected final HashMap<String, Double> parametersTable = new HashMap<String, Double>();
     protected double epsilon = 1E-10;
     public TreeSet<String> getVariablesList() {
         return variablesList;

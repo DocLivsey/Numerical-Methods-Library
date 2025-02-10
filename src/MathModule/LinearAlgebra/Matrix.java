@@ -1,707 +1,312 @@
 package MathModule.LinearAlgebra;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
-
-import MathModule.NumericalBase;
-import OtherThings.*;
+import MathModule.Abstract.AbstractMatrix;
+import MathModule.LinearAlgebra.AlgebraicSystem.AlgebraicSystem;
+import OtherThings.PrettyOutput;
+import OtherThings.UsefulThings;
+import Parsers.FileParser;
 import Parsers.InputStreamParser;
 
-public class Matrix extends NumericalBase {
-    protected int rowsCount;
-    protected int columnsCount;
-    protected double[][] matrix;
-    public Matrix(String pathToFile) throws FileNotFoundException
-    {
-        File input = new File(pathToFile);
-        Scanner whileScan = new Scanner(input);
-        String line = whileScan.nextLine();
-        String[] strArr = line.trim().split("\\s+");
-        double[] row;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
-        this.rowsCount = 1;
-        this.columnsCount = strArr.length;
-        this.matrix = new double[this.rowsCount][this.columnsCount];
+public class Matrix extends AbstractMatrix<Double> {
+    public Matrix(String pathToSettingsFile, String pathToMatrixInputTxt, ArrayList<Vector> matrixFromVectors,
+                  Collection<Collection<Double>> matrixFromCollections, Double[][] matrixFromArrays)
+            throws ReflectiveOperationException, IOException {
+        if (pathToSettingsFile != null) {
+            super.setFields(pathToSettingsFile);
+            this.setFields(pathToSettingsFile);
+        } if (pathToMatrixInputTxt != null && (this.matrix == null || this.matrix.isEmpty())) {
+            this.setMatrixFromFile(pathToMatrixInputTxt);
+        } else {
+            if (matrixFromVectors != null) {
+                matrixFromVectors.forEach(this::addRow);
+                this.setRows(this.matrix.size());
+                this.setColumns(this.getRowAt(0).getVector().size());
+            } else if (matrixFromCollections != null) {
+                this.setMatrix(matrixFromCollections);
+            } else if (matrixFromArrays != null) {
+                Collection<Double[]> firstTransformStage = Arrays.stream(matrixFromArrays).toList();
+                Collection<Collection<Double>> secondTransformStage = new ArrayList<>(){{
+                    firstTransformStage.forEach(row -> this.add(Arrays.stream(row).toList()));
+                }};
+                this.setMatrix(secondTransformStage);
+            } else {
+                this.matrix = new ArrayList<>();
+                this.setRows(0);
+                this.setColumns(0);
+            }
+        }
+    }
+    public Matrix(String pathToSettingsFile, String pathToMatrixInputTxt)
+            throws ReflectiveOperationException, IOException {
+        this(pathToSettingsFile, pathToMatrixInputTxt, null, null, null);
+    }
+    public Matrix(String pathToMatrixInputTxt) throws ReflectiveOperationException, IOException {
+        this(null, pathToMatrixInputTxt);
+    }
+    public Matrix(String pathToSettingsFile, ArrayList<Vector> matrixFromVectors)
+            throws ReflectiveOperationException, IOException {
+        this(pathToSettingsFile, null, matrixFromVectors, null, null);
+    }
+    public Matrix(ArrayList<Vector> matrixFromVectors) throws ReflectiveOperationException, IOException {
+        this(null, matrixFromVectors);
+    }
+    public Matrix(String pathToSettingsFile, Collection<Collection<Double>> matrixFromCollections)
+            throws ReflectiveOperationException, IOException {
+        this(pathToSettingsFile, null, null, matrixFromCollections, null);
+    }
+    public Matrix(Collection<Collection<Double>> matrixFromCollections) throws ReflectiveOperationException, IOException {
+        this(null, matrixFromCollections);
+    }
+    public Matrix(String pathToSettingsFile, Double[][] matrixFromArrays)
+            throws ReflectiveOperationException, IOException {
+        this(pathToSettingsFile, null, null, null, matrixFromArrays);
+    }
+    public Matrix(Double[][] matrixFromArrays) throws ReflectiveOperationException, IOException {
+        this(null, matrixFromArrays);
+    }
+    public Matrix() throws ReflectiveOperationException, IOException {
+        this((String) null);
+    }
+    public Matrix createZeroMatrix(int rows, int columns) throws ReflectiveOperationException, IOException {
+        return new Matrix(
+                new ArrayList<>(Collections.nCopies(rows,
+                        new ArrayList<>(Collections.nCopies(columns, 0.0)))
+        ));
+    }
+    public Matrix copy() throws ReflectiveOperationException, IOException {
+        Collection<Collection<Double>> copyMatrix = new ArrayList<>();
+        this.matrix.forEach(row -> copyMatrix.add(row.getVector()));
+        return new Matrix(copyMatrix);
+    }
 
+    @Override
+    public int hashCode() {
+        return (int) ChebyshevNorm();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return this.matrix.equals(((Matrix) obj).getMatrix());
+    }
+    @Override
+    public String toString() {
+        return this.toString("");
+    }
+    public String toString(String outputFormatPattern) {
+        StringBuilder toString = new StringBuilder();
+        this.getMatrix().forEach(row -> {
+            Vector vector = null;
+            try {
+                vector = new Vector(row.getVector());
+            } catch (IOException | ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+            toString.append(vector.toString(outputFormatPattern)).append("\n");
+        });
+        return toString.toString();
+    }
 
-        while (whileScan.hasNextLine())
-        {
-            line = whileScan.nextLine();
-            strArr = line.trim().split("\\s+");
-            row = new double[strArr.length];
-            for (int i = 0; i < strArr.length; i++)
-                row[i] = Double.parseDouble(strArr[i]);
-            this.addRow(row);
-        }
-        Scanner finalScan = new Scanner(input);
-        line = finalScan.nextLine();
-        strArr = line.trim().split("\\s+");
-        row = new double[strArr.length];
-        for (int i = 0; i < strArr.length; i++)
-            row[i] = Double.parseDouble(strArr[i]);
-        this.setRow(row, 0);
-    }
-    public Matrix()
-    {
-        System.out.println(PrettyOutput.INPUT + "Введите количество строк и столбцов в матрице:" + PrettyOutput.RESET);
-        Scanner scan = new Scanner(System.in);
-        int rowsCount = scan.nextInt();
-        int columnsCount = scan.nextInt();
-        this.rowsCount = rowsCount;
-        this.columnsCount = columnsCount;
-        this.matrix = new double[rowsCount][columnsCount];
-    }
-    public Matrix(int rowsCount, int columnsCount)
-    {
-        this.rowsCount = rowsCount;
-        this.columnsCount = columnsCount;
-        this.matrix = new double[rowsCount][columnsCount];
-        for (int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-                this.setItem(i, j, Double.NaN);
-    }
-    public Matrix(double[][] matrix, int rowsCount, int columnsCount)
-    {
-        this.rowsCount = rowsCount;
-        this.columnsCount = columnsCount;
-        this.matrix = matrix;
-    }
-    public int getRowsCount()
-    { return this.rowsCount; }
-    public int getColumnsCount()
-    { return this.columnsCount; }
-    public double[][] getMatrix()
-    { return this.matrix; }
-    public double getItem (int indexRow, int indexColumn)
-    { return this.matrix[indexRow][indexColumn]; }
-    public void setMatrix(double[][] matrix)
-    { this.matrix = matrix; }
-    public void setItem(int rowIndex, int colIndex, double replaceItem)
-    { this.matrix[rowIndex][colIndex] = replaceItem; }
-    public void setRow(double[] row, int index)
-    {
-        if (this.columnsCount != row.length)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно заменить строку в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
-        else
-            this.matrix[index] = row;
-    }
-    public void setColumn(double[] column, int index)
-    {
-        if (this.rowsCount != column.length)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно заменить столбец в исходной матрице из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
-        else
-            for (int i = 0; i < this.rowsCount; i++)
-                this.setItem(i, index, column[i]);
-    }
-    public boolean equals(Object obj)
-    { return super.equals(obj); }
-    public Matrix cloneMatrix()
-    {
-        Matrix cloneMatrix = new Matrix(this.rowsCount, this.columnsCount);
-        for (int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-                cloneMatrix.setItem(i, j, this.getItem(i, j));
-        return cloneMatrix;
-    }
-    protected void initializeMatrix()
-    {
-        Scanner scan = new Scanner(System.in);
-        System.out.println(PrettyOutput.INPUT + "Введите элементы матрицы " + rowsCount + " на " + columnsCount + ":" + PrettyOutput.RESET);
-        for(int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-            {
-                double a = scan.nextDouble();
-                this.setItem(i, j, a);
-            }
-    }
-    protected void initializeRandomMatrix(double from, double to)
-    {
-        Random random = new Random();
-        for (int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-                this.setItem(i, j, random.nextDouble(from, to));
-    }
-    protected void initializeRandomIntMatrix(int from, int to)
-    {
-        Random random = new Random();
-        for (int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-                this.setItem(i, j, random.nextInt(from, to));
-    }
-    public static Matrix createNewMatrix()
-    {
-        Matrix matrix = new Matrix();
-        matrix.initializeMatrix();
-        return matrix;
-    }
-    public static Matrix createNewMatrix(int rowsCount, int columnsCount)
-    {
-        Matrix matrix = new Matrix(rowsCount, columnsCount);
-        matrix.initializeMatrix();
-        return matrix;
-    }
-    public static Matrix createNewRandomIntMatrix(int from, int to)
-    {
-        Matrix matrix = new Matrix();
-        matrix.initializeRandomIntMatrix(from, to);
-        return matrix;
-    }
-    public static Matrix createNewRandomIntMatrix(int rowsCount, int columnsCount, int from, int to)
-    {
-        Matrix matrix = new Matrix(rowsCount, columnsCount);
-        matrix.initializeRandomIntMatrix(from, to);
-        return matrix;
-    }
-    public static Matrix createNewRandomMatrix(double from, double to)
-    {
-        Matrix matrix = new Matrix();
-        matrix.initializeRandomMatrix(from, to);
-        return matrix;
-    }
-    public static Matrix createNewRandomMatrix(int rowsCount, int columnsCount, double from, double to)
-    {
-        Matrix matrix = new Matrix(rowsCount, columnsCount);
-        matrix.initializeRandomMatrix(from, to);
-        return matrix;
-    }
-    public void createSingleMatrix()
-    {
-        for (int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-            {
-                if (i == j) this.setItem(i, j, 1);
-                else this.setItem(i, j, 0);
-            }
-    }
-    public void printMatrix()
-    {
-        System.out.println(PrettyOutput.HEADER_OUTPUT + "Матрица " + rowsCount + " на " + columnsCount + ":" + PrettyOutput.OUTPUT);
-        for(int i = 0; i < this.rowsCount; i++)
-        {
-            for (int j = 0; j < this.columnsCount; j++)
-            {
-                System.out.print(this.getItem(i, j) + " ");
-            }
-            System.out.println();
-        }
-        System.out.print(PrettyOutput.RESET);
-    }
-    public void printFormattedMatrix()
-    {
-        System.out.println(PrettyOutput.HEADER_OUTPUT + "Матрица " + rowsCount + " на " + columnsCount + ":" + PrettyOutput.OUTPUT);
-        for(int i = 0; i < this.rowsCount; i++)
-        {
-            for (int j = 0; j < this.columnsCount; j++)
-            {
-                DecimalFormat formattedOut = new DecimalFormat("#.##");
-                String result = formattedOut.format(this.getItem(i, j));
-                System.out.print(result + " ");
-            }
-            System.out.println();
-        }
-        System.out.print(PrettyOutput.RESET);
-    }
-    // REMAKE write in file methods
-    public void writeInFile(String pathToFile) throws IOException
-    {
-        FileWriter fileWriter = new FileWriter(pathToFile);
-        for (int i = 0; i < this.rowsCount; i++)
-        {
-            for (int j = 0; j < this.columnsCount; j++)
-            {
-                DecimalFormat formattedOut = new DecimalFormat("#.##");
-                String result = formattedOut.format(this.getItem(i, j));
-                fileWriter.write(result + " ");
-            }
-            fileWriter.write("\n");
-        }
-        fileWriter.close();
-    }
-    public void writeFormattedInFile(String pathToFile) throws IOException
-    {
-        FileWriter fileWriter = new FileWriter(pathToFile);
-        for (int i = 0; i < this.rowsCount; i++)
-        {
-            for (int j = 0; j < this.columnsCount; j++)
-            {
-                fileWriter.write(this.getItem(i, j) + " ");
-            }
-            fileWriter.write("\n");
-        }
-        fileWriter.close();
-    }
-    public void addRow(double[] row)
-    {
-        if (row.length != this.columnsCount)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
-        else
-        {
-            this.rowsCount ++;
-            double[][] newMatrix = new double[this.rowsCount][this.columnsCount];
-            for (int i = 0; i < this.rowsCount; i++)
-            {
-                if (i != this.rowsCount - 1)
-                    System.arraycopy(this.matrix[i], 0, newMatrix[i], 0, this.columnsCount);
-                else newMatrix[i] = row;
-            }
-            this.matrix = newMatrix;
-        }
-    }
-    public void addRowAfter (double[] row, int index)
-    {
-        if (row.length != this.columnsCount)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить строку в исходную матрицу из-за несоответсвия количества столбцов" + PrettyOutput.RESET); }
-        else
-        {
-            this.rowsCount ++;
-            double[][] newMatrix = new double[this.rowsCount][this.columnsCount];
-            newMatrix[index + 1] = row;
-            for (int i = 0; i < this.rowsCount; i++)
-            {
-                if (i < index + 1)
-                    newMatrix[i] = this.matrix[i];
-                else if (i > index + 1)
-                    newMatrix[i] = this.matrix[i - 1];
-            }
-            this.matrix = newMatrix;
-        }
-    }
-    public void deleteRow(int index)
-    {
-        if (index > this.rowsCount || index < 0)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Номер строки указан неверно" + PrettyOutput.RESET); }
-        else
-        {
-            Matrix newMatrix = new Matrix(this.rowsCount - 1, this.columnsCount);
-            int tmpIndex = 0;
-            for (int i = 0; i < this.rowsCount; i++)
-                if (i != index)
-                {
-                    newMatrix.setRow(this.matrix[i], tmpIndex);
-                    tmpIndex++;
+    public void setMatrixFromFile(String pathToFile) throws IOException {
+        this.matrix = new ArrayList<>();
+        List<List<Double>> inputMatrix = FileParser.readDataFromFile(pathToFile,
+                from -> {
+                    List<List<Double>> vectorsList = new ArrayList<>();
+                    for (var line : from) {
+                        List<String> linesElements = Arrays.asList(line.strip().split("\\s+"));
+                        vectorsList.add((List<Double>) UsefulThings.map(linesElements, Double::parseDouble));
+                    }
+                    return vectorsList;
+                });
+        if (inputMatrix.size() > 1) {
+            inputMatrix.forEach(row -> {
+                try {
+                    this.addRow(new Vector((ArrayList<Double>) row));
+                } catch (IOException | ReflectiveOperationException e) {
+                    throw new RuntimeException(e);
                 }
-            this.rowsCount --;
-            this.matrix = newMatrix.getMatrix();
+            });
+            this.setRows(this.matrix.size());
+            this.setColumns(this.getColumnAt(0).getVectorSize());
+        } else {
+            throw new RuntimeException(PrettyOutput.ERROR + "Невозможно считать матрицу с файла\n" +
+                    "Размерность входных данных не соответсвует определению матрицы\n" +
+                    "Веорятно в файле записана не матрица" + PrettyOutput.RESET);
         }
     }
-    public void addColumn(double[] column)
-    {
-        if (column.length != this.rowsCount)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
+    public void writeMatrixInFile(String pathToFile, String outputFormatPattern) throws IOException {
+        FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
+    }
+    public void writeMatrixInDesiredFolder(String pathToFolder, String fileName, String outputFormatPattern)
+            throws IOException {
+        Pattern pattern = Pattern.compile("\\w+\\.txt$");
+        String pathToFile;
+        if (pattern.matcher(pathToFolder).matches())
+            pathToFile = pathToFolder + fileName;
         else
-        {
-            this.columnsCount ++;
-            double[][] newMatrix = new double[this.rowsCount][this.columnsCount];
-            for (int i = 0; i < this.rowsCount; i++)
-                for (int j = 0; j < this.columnsCount; j++)
-                {
-                    if (j != this.columnsCount - 1)
-                        newMatrix[i][j] = this.getItem(i, j);
-                    else newMatrix[i][j] = column[i];
-                }
-            this.matrix = newMatrix;
-        }
+            pathToFile = pathToFolder + fileName + ".txt";
+        FileParser.writeDataInFile(pathToFile, this.toString(outputFormatPattern));
     }
-    public void addColumnAfter (double[] column, int index)
-    {
-        if (column.length != this.rowsCount)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Невозможно добавить столбец в исходную матрицу из-за несоответсвия количества строк" + PrettyOutput.RESET); }
-        else
-        {
-            this.columnsCount ++;
-            double[][] newMatrix = new double[this.rowsCount][this.columnsCount];
-            for (int i = 0; i < this.rowsCount; i++)
-            {
-                newMatrix[i][index + 1] = column[i];
-                for (int j = 0; j < this.columnsCount; j++)
-                {
-                    if (j < index + 1)
-                        newMatrix[i][j] = this.getItem(i, j);
-                    else if (j > index + 1)
-                        newMatrix[i][j] = this.getItem(i, j - 1);
-                }
-            }
-            this.matrix = newMatrix;
-        }
-    }
-    public void deleteColumn(int index)
-    {
-        if (index > this.columnsCount || index < 0)
-        { throw new RuntimeException(PrettyOutput.ERROR + "Номер столбца указан неверно" + PrettyOutput.RESET); }
-        else
-        {
-            Matrix newMatrix = new Matrix(this.rowsCount, this.columnsCount - 1);
-            int tmpIndex = 0;
-            for (int i = 0; i < this.columnsCount; i++)
-                if (i != index)
-                {
-                    double[] tmpCol = new double[this.rowsCount];
-                    for (int j = 0; j < this.rowsCount; j++)
-                        tmpCol[j] = this.getItem(j, i);
-                    newMatrix.setColumn(tmpCol, tmpIndex);
-                    tmpIndex++;
-                }
-            this.columnsCount --;
-            this.matrix = newMatrix.getMatrix();
-        }
-    }
+
     public Matrix partOfMatrix(int leftBorder, int rightBorder, int upBorder, int downBorder)
-    {
-        int newRowsCount = downBorder - upBorder + 1;
-        int newColumnsCount = rightBorder - leftBorder + 1;
-        double[][] matrixPart = new double[newRowsCount][newColumnsCount];
-        for (int oldRow = upBorder, newRow = 0; oldRow < downBorder + 1; oldRow++, newRow++)
-            for (int oldCol = leftBorder, newCol = 0; oldCol < rightBorder + 1; oldCol++, newCol++)
-                matrixPart[newRow][newCol] = this.getItem(oldRow, oldCol);
-        return new Matrix(matrixPart, newRowsCount, newColumnsCount);
-    }
-    public Matrix matrixAddition(Matrix addMatrix)
-    {
-        if (this.rowsCount != addMatrix.rowsCount || this.columnsCount != addMatrix.columnsCount)
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц разные \n" + PrettyOutput.COMMENT + "Пожалуйста, введите матрицы одного размера" + PrettyOutput.RESET);
-        else
-        {
-            Matrix resultMatrix = new Matrix(this.rowsCount, addMatrix.columnsCount);
-            for(int i = 0; i < resultMatrix.getRowsCount(); i++)
-                for(int j = 0; j < resultMatrix.getColumnsCount(); j++)
-                { resultMatrix.setItem(i, j, this.getItem(i, j) + addMatrix.getItem(i, j)); }
-            return resultMatrix;
+            throws ReflectiveOperationException, IOException {
+        Matrix partOfMatrix = new Matrix();
+        for (int oldRow = upBorder, newRow = 0; oldRow < downBorder + 1; oldRow++, newRow++) {
+            Vector partOfRow = new Vector(this.getRowAt(oldRow).getVector());
+            partOfMatrix.addRow(partOfRow.partOfVector(leftBorder, rightBorder));
         }
+        return partOfMatrix;
     }
-    public Matrix constantMultiplication(double constant)
-    {
-        double[][] newMatrix = this.matrix;
-        for (int i = 0; i < this.rowsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-            { newMatrix[i][j] *= constant; }
-        return new Matrix(newMatrix, this.rowsCount, this.columnsCount);
+    public Matrix setMinor(int rowIndex, int colIndex) throws ReflectiveOperationException, IOException {
+        Matrix minor = this.copy();
+        minor.removeRowAt(rowIndex);
+        minor.removeColumnAt(colIndex);
+        return minor.copy();
     }
-    public Matrix matrixMultiplication(Matrix addMatrix)
-    {
-        if (this.columnsCount != addMatrix.getRowsCount())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц разные \n" + PrettyOutput.COMMENT +
-                    "Пожалуйста, убедитесь, что количество столбцов первой матрицы равно количеству строк второй матрицы" + PrettyOutput.RESET);
-        else
-        {
-            Matrix resultMatrix = new Matrix(this.rowsCount, addMatrix.getColumnsCount());
-            for (int i = 0; i < this.rowsCount; i++)
-            {
-                resultMatrix.getMatrix()[i] = new double[addMatrix.getColumnsCount()];
-                for (int j = 0; j < addMatrix.getColumnsCount(); j++)
-                {
-                    resultMatrix.setItem(i, j, 0);
 
-                    for (int k = 0; k < addMatrix.getRowsCount(); k++)
-                    { resultMatrix.getMatrix()[i][j] += this.getItem(i, k) * addMatrix.getItem(k, j); }
-                }
+    public void validateAbstractMethodsInput(Object... arguments) throws ReflectiveOperationException, IOException {
+        if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Matrix.class)) {
+            throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "\nОшибка! Неверное количество переданных аргументов\n" +
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Matrix.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "матрица " +
+                    "с которой суммируем / на которую умножаем\n" + PrettyOutput.RESET);
+        } else if (!InputStreamParser.isClassesInListAtOnce(Arrays.stream(arguments).toList(), Double.class)) {
+            throw new RuntimeException(PrettyOutput.ERROR_UNDERLINED + "\nОшибка! Неверное количество переданных аргументов\n" +
+                    "Ожидалось на вход:\n" + PrettyOutput.CHOOSE + "class: " + PrettyOutput.COMMENT + Double.class +
+                    PrettyOutput.CHOOSE + " Описание: " + PrettyOutput.COMMENT + "константа на которую умножаем\n" + PrettyOutput.RESET);
+        }
+        double constant = 1;
+        Matrix matrix = new Matrix();
+        OperationsType type = null;
+        for (var argument : arguments) {
+            if (argument instanceof Matrix) {
+                matrix = (Matrix) argument;
+            } if (argument instanceof OperationsType) {
+                type = (OperationsType) argument;
+            } if (argument instanceof Double) {
+                constant = (Double) argument;
             }
-            return resultMatrix;
+        }
+        if (type == OperationsType.ADDITION) {
+            if (matrix.getRows() != this.getRows() && matrix.getColumns() != this.getColumns())
+                throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц не совпадают \n" + PrettyOutput.COMMENT +
+                        "Пожалуйста, введите матрицы одного размера" + PrettyOutput.RESET);
+        } else if (type == OperationsType.MULTIPLY) {
+            if (this.getColumns() != matrix.getRows())
+                throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц не совпадают \n" + PrettyOutput.COMMENT +
+                        "Пожалуйста, убедитесь, что количество столбцов первой матрицы " +
+                        "равно количеству строк второй матрицы" + PrettyOutput.RESET);
         }
     }
-    public Matrix matrixPow(int pow)
-    {
-        Matrix matrixPow = this.cloneMatrix();
+    @Override
+    public AbstractMatrix<? extends Number> add(Object... arguments) {
+        return null;
+    }
+    @Override
+    public AbstractMatrix<? extends Number> multiply(Object... arguments) {
+        return null;
+    }
+    @Override
+    public AbstractMatrix<? extends Number> constMultiply(Object... arguments) {
+        return null;
+    }
+
+    public Matrix matrixPow(int pow) throws ReflectiveOperationException, IOException {
+        Matrix matrixPow = this.copy();
         for (int i = 0; i < pow - 1; i++)
-            matrixPow = matrixPow.matrixMultiplication(this).cloneMatrix();
+            matrixPow = ((Matrix) this.multiply(matrixPow)).copy();
         return matrixPow;
     }
-    public Vector matrixAndVectorMultiplication(Vector addVector) throws ReflectiveOperationException, IOException {
-        Matrix vectorMatrix = addVector.toMatrix();
-        Vector resultVector;
-        resultVector = this.matrixMultiplication(vectorMatrix).matrixToVector();
-        return resultVector;
+    public Matrix multiply(Vector vector) throws ReflectiveOperationException, IOException {
+        Matrix vectorToMatrix = vector.toMatrix();
+        return (Matrix) this.multiply(vectorToMatrix);
     }
-    public Vector matrixToVector() throws ReflectiveOperationException, IOException {
-        if (this.columnsCount != 1)
-            throw new RuntimeException(PrettyOutput.ERROR + "Преобразование из матрицы в вектор невозможно." + PrettyOutput.RESET);
-        else
-        {
-            Vector convertVector = new Vector();
-            for (int i = 0; i < this.rowsCount; i++)
-                convertVector.setElementAt(this.getItem(i, 0), i);
-            return convertVector;
+    public Vector toVector() throws ReflectiveOperationException, IOException {
+        if (this.columns > 1)
+            throw new RuntimeException(PrettyOutput.ERROR +
+                    "Преобразование из матрицы в вектор невозможно." + PrettyOutput.RESET);
+        Vector convertVector = new Vector();
+        this.getMatrix().forEach(row -> convertVector.addElement(row.getElementAt(0)));
+        return convertVector;
+    }
+    public AlgebraicSystem makeAlgebraicSystem(Vector addjoinVector) throws ReflectiveOperationException, IOException {
+        return new AlgebraicSystem(this, addjoinVector);
+    }
+    public Matrix transposition() throws ReflectiveOperationException, IOException {
+        Double[][] transposedMatrix = new Double[columns][rows];
+        for (int i = 0; i < columns; i++) {
+            for (int j = 0; j < rows; j++)
+                transposedMatrix[i][j] = getElementAt(j, i);
         }
+        return new Matrix(transposedMatrix);
     }
-    public Matrix transposition()
-    {
-        double[][] transpositionMatrix = new double[this.columnsCount][this.rowsCount];
-        for(int i = 0; i < this.columnsCount; i++)
-            for (int j = 0; j < this.columnsCount; j++)
-            { transpositionMatrix[i][j] = this.getItem(j, i); }
-        return new Matrix(transpositionMatrix, this.columnsCount, this.rowsCount);
-    }
-
-    public boolean isMatrixEqual(Matrix compareMatrix)
-    {
-        if (this.rowsCount != compareMatrix.getRowsCount() || this.columnsCount != compareMatrix.getColumnsCount())
-            throw new RuntimeException(PrettyOutput.ERROR + "Размеры матриц разные" + PrettyOutput.RESET);
-        else
-        {
-            for (int i = 0; i < this.rowsCount; i++)
-                for (int j = 0; j < this.columnsCount; j++)
-                    if (this.getItem(i, j) != compareMatrix.getItem(i, j))
-                        return false;
-            return true;
-        }
-    }
-    public void swapRow(int indexChange, int indexChangeWith)
-    {
-        double[] tmpRow = this.matrix[indexChange];
-        this.matrix[indexChange] = this.matrix[indexChangeWith];
-        this.matrix[indexChangeWith] = tmpRow;
-    }
-    public void swapColumn(int indexChange, int indexChangeWith)
-    {
-        for (int i = 0; i < this.rowsCount; i++)
-        {
-            double tmpCol = this.getItem(i, indexChange);
-            this.setItem(i, indexChange, this.getItem(i, indexChangeWith));
-            this.setItem(i, indexChangeWith, tmpCol);
-        }
-    }
-    public Matrix gaussianTransform()
-    {
-        Matrix cloneMatrix = this.cloneMatrix();
-        for (int k = 0; k < cloneMatrix.getRowsCount() - 1; k++)
-            for (int i = k + 1; i < cloneMatrix.getRowsCount(); i++)
-            {
-                if (cloneMatrix.getItem(k, k) == 0)
-                {
-                    for (int l = i; l < cloneMatrix.getRowsCount(); l++)
-                    {
-                        if (cloneMatrix.getItem(l, l) != 0) {cloneMatrix.swapRow(k, l);}
-                        else throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
+    public Matrix gaussianTransform() throws ReflectiveOperationException, IOException {
+        Matrix cloneMatrix = this.copy();
+        for (int k = 0; k < cloneMatrix.getRows() - 1; k++)
+            for (int i = k + 1; i < cloneMatrix.getRows(); i++) {
+                if (cloneMatrix.getElementAt(k, k) == 0) {
+                    for (int l = i; l < cloneMatrix.getRows(); l++) {
+                        if (cloneMatrix.getElementAt(l, l) != 0) {cloneMatrix.swapRow(k, l);}
+                        else throw new RuntimeException(PrettyOutput.ERROR +
+                                "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
                     }
                 }
-                double tmp = cloneMatrix.getItem(i, k) / cloneMatrix.getItem(k, k);
-                for (int j = k; j < cloneMatrix.getColumnsCount(); j++)
-                { cloneMatrix.getMatrix()[i][j] -= tmp * cloneMatrix.getItem(k, j); }
+                double tmp = cloneMatrix.getElementAt(i, k) / cloneMatrix.getElementAt(k, k);
+                for (int j = k; j < cloneMatrix.getColumns(); j++)
+                    cloneMatrix.setElementAt(
+                            cloneMatrix.getElementAt(i, j) - tmp * cloneMatrix.getElementAt(k, j), i, j);
             }
         return cloneMatrix;
     }
-    public double gaussianDeterminant()
-    {
-        double[][] copyMatrix = new double[this.rowsCount][this.columnsCount];
-        for (int i = 0; i < this.rowsCount; i++)
-            System.arraycopy(this.matrix[i], 0, copyMatrix[i], 0, this.columnsCount);
-        Matrix tempMatrix = new Matrix(copyMatrix, this.rowsCount, this.columnsCount);
+    public double gaussianDeterminant() throws ReflectiveOperationException, IOException {
+        Double[][] copyMatrix = new Double[getRows()][getColumns()];
+        for (int i = 0; i < getRows(); i++) {
+            for (int j = 0; j < getColumns(); j++) {
+                copyMatrix[i][j] = getElementAt(i, j);
+            }
+        }
+        Matrix tempMatrix = new Matrix(copyMatrix);
         double determinant = 1;
-        for (int k = 0; k < rowsCount - 1; k++)
-            for (int i = k + 1; i < rowsCount; i++)
+        for (int k = 0; k < getRows() - 1; k++)
+            for (int i = k + 1; i < getRows(); i++)
             {
-                if (tempMatrix.getItem(k, k) == 0)
+                if (tempMatrix.getElementAt(k, k) == 0)
                 {
-                    for (int l = i; l < this.rowsCount; l++)
+                    for (int l = i; l < getRows(); l++)
                     {
-                        if (tempMatrix.getItem(l, l) != 0) {tempMatrix.swapRow(k, l); determinant *= -1;}
-                        else if (tempMatrix.getItem(l, l) == 0 && l == this.rowsCount - 1)
+                        if (tempMatrix.getElementAt(l, l) != 0) {tempMatrix.swapRow(k, l); determinant *= -1;}
+                        else if (tempMatrix.getElementAt(l, l) == 0 && l == getRows() - 1)
                             throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Деление на ноль, невозможно посчитать определитель" + PrettyOutput.RESET);
                     }
                 }
-                double tmp = tempMatrix.getItem(i, k) / tempMatrix.getItem(k, k);
-                for (int j = k; j < columnsCount; j++)
-                { tempMatrix.getMatrix()[i][j] -= tmp * tempMatrix.getItem(k, j); }
+                double tmp = tempMatrix.getElementAt(i, k) / tempMatrix.getElementAt(k, k);
+                for (int j = k; j < columns; j++)
+                    tempMatrix.setElementAt(
+                            tempMatrix.getElementAt(i, j) - tmp * tempMatrix.getElementAt(k, j), i, j);
             }
-        for (int i = 0; i < this.rowsCount; i++)
-        { determinant *= tempMatrix.getItem(i, i); }
+        for (int i = 0; i < getRows(); i++)
+        { determinant *= tempMatrix.getElementAt(i, i); }
         return Math.round(determinant);
     }
-    public double matrix2By2Determinant()
-    {
-        if (this.rowsCount != 2 || this.columnsCount != 2)
-            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Данный метод вычисления определителя работает только для матриц 2 на 2");
-        else
-        {
-            double firstTerm = this.getItem(0, 0) * this.getItem(1, 1);
-            double secondTerm = this.getItem(0, 1) * this.getItem(1, 0);
-
-            return firstTerm - secondTerm;
-        }
+    public double ChebyshevNorm() {
+        AtomicReference<Double> result = new AtomicReference<>(Double.MIN_VALUE);
+        this.matrix.forEach(row -> {
+            result.set(Math.min(result.get(), row.getVector().stream().reduce(Double::sum).get()));
+        });
+        return result.get();
     }
-    public double matrix3By3Determinant()
-    {
-        if (this.rowsCount != 3 || this.columnsCount != 3)
-            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Данный метод вычисления определителя работает только для матриц 3 на 3");
-        else
-        {
-            double firstTerm = 1;
-            for (int i = 0; i < this.rowsCount; i++)
-                firstTerm *= this.getItem(i, i);
-            double secondTerm = this.getItem(0, 1) * this.getItem(1, 2) * this.getItem(2, 0);
-            double thirdTerm = this.getItem(0, 2) * this.getItem(1, 0) * this.getItem(2, 1);
-            double fourthTerm = this.getItem(0, 0) * this.getItem(1, 2) * this.getItem(2, 1);
-            double fifthTerm = this.getItem(0, 1) * this.getItem(1, 0) * this.getItem(2, 2);
-            double sixthTerm = this.getItem(0, 2) * this.getItem(1,1) * this.getItem(2, 0);
-
-            return firstTerm + secondTerm + thirdTerm - fourthTerm - fifthTerm - sixthTerm;
-        }
-    }
-    public double calculateDeterminant()
-    {
-        double determinant;
-        if (this.rowsCount == 2 && this.columnsCount == 2)
-            determinant = this.matrix2By2Determinant();
-        else if (this.rowsCount == 3 && this.columnsCount == 3)
-            determinant = this.matrix3By3Determinant();
-        else
-            determinant = this.gaussianDeterminant();
-        return determinant;
-    }
-    public Matrix setMinor(int rowIndex, int colIndex)
-    {
-        Matrix minor = this.cloneMatrix();
-        minor.deleteRow(rowIndex);
-        minor.deleteColumn(colIndex);
-        return minor.cloneMatrix();
-    }
-    public Matrix inversion()
-    {
-        Matrix inversiveMatrix = new Matrix(this.rowsCount, this.columnsCount);
-        if (this.rowsCount != this.columnsCount)
-            throw new RuntimeException(PrettyOutput.ERROR + "Ошибка! Матрица не квадратичная. Обратную невозможно посчитать" + PrettyOutput.RESET);
-        else
-        {
-            double determinant = this.calculateDeterminant();
-            if (determinant == 0)
-                throw new RuntimeException(PrettyOutput.ERROR + "Заданная матрица Вырождена. Невозможно найти обратную" + PrettyOutput.RESET);
-            else
-            {
-                for (int i = 0; i < this.rowsCount; i++)
-                {
-                    for (int j = 0; j < this.columnsCount; j++)
-                    {
-                        Matrix minor = this.setMinor(i, j);
-                        double minorDet = minor.calculateDeterminant() * Math.pow(-1, (i + j));
-                        inversiveMatrix.setItem(i, j, minorDet);
-                    }
-                }
-                inversiveMatrix = inversiveMatrix.transposition();
-                inversiveMatrix = inversiveMatrix.constantMultiplication(1 / determinant);
-            }
-        }
-        return inversiveMatrix;
-    }
-    public boolean isNanMatrix()
-    {
-        for (double[] row : this.matrix)
-            for (double item : row)
-                if (Double.isNaN(item))
+    public boolean isNanMatrix() {
+        for (var row : this.matrix)
+            for (var element : row.getVector())
+                if (Double.isNaN(element))
                     return true;
         return false;
     }
-    public boolean isMatrixSingular() { return this.calculateDeterminant() == 0;}
-
-    // IN PLANS MAKE THIS A CHILD CLASS OF PAIR<DOUBLE, VECTOR>
-    public static class EigenPair {
-        protected double eigenValue;
-        protected Vector eigenVector;
-        public EigenPair(double eigenValue, Vector eigenVector)
-        { this.eigenValue = eigenValue; this.eigenVector = eigenVector; }
-        public double getEigenValue() {
-            return eigenValue;
-        }
-        public Vector getEigenVector() {
-            return eigenVector;
-        }
-        public void setEigenValue(double eigenValue) {
-            this.eigenValue = eigenValue;
-        }
-        public void setEigenVector(Vector eigenVector) {
-            this.eigenVector = eigenVector;
-        }
-        @Override
-        public String toString()
-        { return "eigenValue = " + this.eigenValue + " eigenVector = " + this.eigenVector.toString(); }
-        public static boolean isTheVectorSignChanged(Vector eigenVectorBefore, Vector eigenVectorAfter)
-        {
-            boolean flagIsChanged = true;
-            for (int i = 0; i < eigenVectorBefore.getVectorSize(); i++)
-                if (Math.round(eigenVectorAfter.getElementAt(i) * eigenVectorBefore.getElementAt(i)) > 0)
-                    flagIsChanged = false;
-            return flagIsChanged;
-        }
-    }
-
-    public double PM_AlgorithmFindBiggestEigenPair(Vector y_0) throws ReflectiveOperationException, IOException {
-        if (this.rowsCount != this.columnsCount)
-            throw new RuntimeException(PrettyOutput.ERROR + "Для нахождения собственной пары матрица " +
-                    "должна быть квадратной" + PrettyOutput.RESET);
-        System.out.println(PrettyOutput.ERROR + "Внимание, степенной метод работает только для матриц простой структуры"
-                + PrettyOutput.RESET);
-        double maxAbsLambda;
-        if (y_0 == null || y_0.isEmpty())
-            y_0 = Vector.createRandomVector(this.rowsCount, -10.0, 10.0);
-        double normaY = y_0.ChebyshevNorm();
-        Vector x_0 = (Vector) y_0.copy().constMultiply(1 / normaY);
-        double lambda_K = 0;
-        Vector xPrev = x_0.copy();
-        do {
-            maxAbsLambda = lambda_K;
-            Vector yNew = this.matrixAndVectorMultiplication(xPrev).copy();
-            normaY = yNew.ChebyshevNorm();
-            for (int i = 0; i < xPrev.getVectorSize(); i++)
-                if (Math.abs(xPrev.getElementAt(i)) > this.getEpsilon())
-                    lambda_K += (yNew.getElementAt(i) / xPrev.getElementAt(i));
-            Vector xNew = (Vector) yNew.copy().constMultiply(1 / normaY);
-            xPrev = xNew.copy();
-        } while(Math.abs(lambda_K - maxAbsLambda) >= this.getEpsilon());
-        maxAbsLambda = lambda_K;
-        return maxAbsLambda;
-    }
-    public EigenPair powMethod(int pow, Vector y_0) throws ReflectiveOperationException, IOException {
-        if (this.rowsCount != this.columnsCount)
-            throw new RuntimeException(PrettyOutput.ERROR + "Для нахождения собственной пары матрица " +
-                    "должна быть квадратной" + PrettyOutput.RESET);
-        int iterationsCount = 1;
-        double maxAbsLambda;
-        System.out.println(PrettyOutput.ERROR + "Внимание, степенной метод работает только для " +
-                "матриц простой структуры" + PrettyOutput.RESET);
-        if (y_0 == null)
-            y_0 = Vector.createRandomVector(this.rowsCount, -10.0, 10.0);
-        double normaY = y_0.ChebyshevNorm();
-        Vector x_0 = (Vector) y_0.copy().constMultiply(1 / normaY);
-        double lambda_K = 0;
-        Vector xPrev = x_0.copy();
-        do {
-            iterationsCount++;
-            maxAbsLambda = lambda_K;
-            Vector yNew = this.matrixPow(pow).cloneMatrix().matrixAndVectorMultiplication(xPrev).copy();
-            normaY = yNew.ChebyshevNorm();
-            for (int i = 0; i < xPrev.getVectorSize(); i++)
-                if (Math.abs(xPrev.getElementAt(i)) > this.getEpsilon())
-                    lambda_K = (yNew.getElementAt(i) / xPrev.getElementAt(i));
-            lambda_K = Math.pow(Math.abs(lambda_K), (double) 1 / pow);
-            Vector xNew = (Vector) yNew.copy().constMultiply(1 / normaY);
-            xPrev = xNew.copy();
-        } while(Math.abs(lambda_K - maxAbsLambda) >= this.getEpsilon());
-        maxAbsLambda = lambda_K;
-        if (EigenPair.isTheVectorSignChanged(xPrev, this.matrixAndVectorMultiplication(xPrev)))
-            maxAbsLambda = -maxAbsLambda;
-        System.out.println("COUNT OF ITERATIONS: " + iterationsCount);
-        return new EigenPair(maxAbsLambda, xPrev);
-    }
-    /* СТЕПЕННОЙ МЕТОД
-    АЛГОРИТМ ВЫЧИСЛЕНИЯ НАИБОЛЬШЕГО ПО МОДУЛЮ СОБСТВЕННОГО ЗНАЧЕНИЯ МАТРИЦЫ */
-    public EigenPair advancedPowMethod(int pow, Vector y_0) throws ReflectiveOperationException, IOException {
-        switch (InputStreamParser.parseChoiceOfTwo("Max", "Min"))
-        {
-            case 1:
-                return this.powMethod(pow, y_0);
-            case 2:
-                EigenPair biggestPair = this.powMethod(pow, y_0);
-                double biggestLambda = biggestPair.getEigenValue();
-                Matrix singleMatrix = new Matrix(this.rowsCount, this.columnsCount);
-                singleMatrix.createSingleMatrix();
-                singleMatrix = singleMatrix.constantMultiplication(-biggestLambda);
-                Matrix newMatrix = this.matrixAddition(singleMatrix).cloneMatrix();
-                EigenPair newPair = newMatrix.powMethod(pow, y_0);
-                return new EigenPair(biggestLambda + newPair.getEigenValue(), newPair.getEigenVector());
-            default:
-                System.out.println(PrettyOutput.ERROR + "ERROR" + PrettyOutput.RESET);
-        }
-        return new EigenPair(Double.NaN, null);
-    }
-    /* ПРОДВИНУТЫЙ СТЕПЕННОЙ МЕТОД
-    АЛГОРИТМ ВЫЧИСЛЕНИЯ НАИБОЛЬШЕГО ИЛИ НАИМЕНЬШЕГО ПО МОДУЛЮ СОБСТВЕННОГО ЗНАЧЕНИЯ МАТРИЦЫ */
 }

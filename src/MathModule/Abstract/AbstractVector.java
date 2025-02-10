@@ -53,12 +53,33 @@ public abstract class AbstractVector<T> extends NumericalBase {
         this.vectorSize = this.vector.size();
     }
 
+    public static<T> AbstractVector<T> convertFromCollection(Collection<T> collection) {
+        return new AbstractVector<T>() {
+            { this.vector = new ArrayList<>(collection); }
+            @Override
+            public AbstractVector<? extends Number> add(Object... arguments) throws ReflectiveOperationException, IOException {
+                return null;
+            }
+            @Override
+            public AbstractVector<? extends Number> subtraction(Object... arguments) throws ReflectiveOperationException, IOException {
+                return null;
+            }
+            @Override
+            public double scalarMultiply(Object... arguments) throws IOException, ReflectiveOperationException {
+                return 0;
+            }
+            @Override
+            public AbstractVector<? extends Number> constMultiply(Object... arguments) throws ReflectiveOperationException, IOException {
+                return null;
+            }
+        };
+    }
+
     public abstract AbstractVector<? extends Number> add(Object... arguments)
             throws ReflectiveOperationException, IOException;
     public abstract AbstractVector<? extends Number> subtraction(Object... arguments)
             throws ReflectiveOperationException, IOException;
     public abstract double scalarMultiply(Object... arguments) throws IOException, ReflectiveOperationException;
-
     public abstract AbstractVector<? extends Number> constMultiply(Object... arguments)
             throws ReflectiveOperationException, IOException;
 }

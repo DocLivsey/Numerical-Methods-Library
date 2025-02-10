@@ -46,8 +46,8 @@ public class Vector extends AbstractVector<Double> {
         Random rand = new Random();
         System.out.println(from + " " + to);
         Integer finalSize = size == null ? rand.nextInt() : size;
-        double finalFrom = from ==null ? rand.nextDouble() : from;
-        double finalTo = to ==null ? rand.nextDouble() : to;
+        double finalFrom = from == null ? rand.nextDouble() : from;
+        double finalTo = to == null ? rand.nextDouble() : to;
         System.out.println(finalSize + " " + finalFrom + " " + finalTo);
         return new Vector(new ArrayList<>(){{
             for (int i = 0; i < finalSize; i++)
@@ -188,23 +188,29 @@ public class Vector extends AbstractVector<Double> {
     /*
      *  ИНЫМИ СЛОВАМИ ТРАНСПОНИРОВАНИЕ
      */
-    public Matrix toMatrix() {
-        double[][] convertMatrix = new double[this.vectorSize][1];
-        for (int i = 0; i < this.vectorSize; i++)
-            convertMatrix[i][0] = this.getElementAt(i);
-        return new Matrix(convertMatrix, this.vectorSize, 1);
+    public Matrix toMatrix() throws ReflectiveOperationException, IOException {
+        Matrix convertMatrix = new Matrix();
+        this.vector.forEach(element -> convertMatrix.addRow(new ArrayList<>(){{add(element);}}));
+        return convertMatrix;
     }
     public Vector partOfVector(int leftBorder, int rightBorder) throws IOException, ReflectiveOperationException {
         ArrayList<Double> vectorPart = new ArrayList<>();
         for (int oldIndex = leftBorder, newIndex = 0; oldIndex < rightBorder + 1; oldIndex++, newIndex++)
-            vectorPart.set(newIndex, this.getElementAt(oldIndex));
+            vectorPart.add(this.getElementAt(oldIndex));
         return new Vector(vectorPart);
     }
     public void sort() {
         this.vector.sort(Double::compareTo);
     }
-    public static Vector sorted(Vector vector) {
-        vector.sort();
+    public static Vector sorted(Vector vector) throws ReflectiveOperationException, IOException {
+        vector.copy().sort();
+        return vector;
+    }
+    public void reverse() {
+        Collections.reverse(getVector());
+    }
+    public static Vector reversed(Vector vector) throws ReflectiveOperationException, IOException {
+        vector.copy().reverse();
         return vector;
     }
     public boolean isEmpty() {

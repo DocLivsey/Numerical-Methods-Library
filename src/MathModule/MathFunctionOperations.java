@@ -21,7 +21,8 @@ public class MathFunctionOperations extends NumericalBase {
         if (mathFunction != null)
         {
             this.mathFunction = mathFunction;
-            this.expandPointsArea();
+            if (!this.points.isEmpty())
+                this.expandPointsArea();
             if (this.isAnyNullValuesInPoints())
                 this.calculateNullValues();
         } else if (this.points.isEmpty()) {
@@ -108,8 +109,11 @@ public class MathFunctionOperations extends NumericalBase {
     { System.out.println(PrettyOutput.HEADER_OUTPUT + "Функция\n" + PrettyOutput.OUTPUT + super.toString() + PrettyOutput.RESET); }
     public Point2D calculatePoint(double x)
     {
-        this.setArgument(0, x);
-        if (Math.abs(this.mathFunction.function(this.arguments).getY()) < super.epsilon)
+        try {
+            this.setArgument(0, x);
+        } catch (Exception ignored) {
+            this.arguments.add(x);
+        } if (Math.abs(this.mathFunction.function(this.arguments).getY()) < super.epsilon)
             return new Point2D(x, 0);
         if (Math.abs(this.mathFunction.function(this.arguments).getY()) == Double.POSITIVE_INFINITY
                 || Double.isNaN(this.mathFunction.function(this.arguments).getY()))
